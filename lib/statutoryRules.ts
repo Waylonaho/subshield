@@ -2,7 +2,7 @@ export interface StateLienRule {
   name: string;
   code: string;
   preliminaryNoticeDays: number | null; // null if not strictly mandated
-  noticeTrigger: 'first_furnishing' | 'invoice_date' | 'none';
+  noticeTrigger: 'first_furnishing' | 'last_furnishing' | 'invoice_date' | 'none';
   lienFilingDays: number;
   lienTrigger: 'last_furnishing' | 'completion';
   statutoryNoticeName: string;
