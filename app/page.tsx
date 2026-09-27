@@ -11,9 +11,10 @@ import {
   CheckCircle2, 
   Lock,
   ArrowRight,
-  HelpCircle,
   FileCheck
 } from 'lucide-react';
+
+const STRIPE_CHECKOUT_URL = 'https://buy.stripe.com/28E14n6FPd3fgpK8K52VG00';
 
 export default function Home() {
   // Bid Estimator Inputs
@@ -107,6 +108,10 @@ export default function Home() {
     document.body.removeChild(link);
   };
 
+  const handleUpgradeClick = () => {
+    window.location.href = STRIPE_CHECKOUT_URL;
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-amber-500 selection:text-black">
       {/* Navigation Header */}
@@ -125,7 +130,7 @@ export default function Home() {
               50-State Statutory Engine Live
             </span>
             <button 
-              onClick={() => alert('Sign-in portal for SubShield Pro subscribers.')}
+              onClick={handleUpgradeClick}
               className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg border border-slate-700 transition"
             >
               Sign In
@@ -465,8 +470,8 @@ export default function Home() {
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <button 
-              onClick={() => alert('Connect your Stripe or Lemon Squeezy checkout URL here!')}
-              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-base px-8 py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 active:scale-95"
+              onClick={handleUpgradeClick}
+              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-base px-8 py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
             >
               <Lock className="w-4 h-4" />
               Upgrade to Pro ($19/mo)
