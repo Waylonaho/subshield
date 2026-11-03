@@ -1,26 +1,39 @@
-import { MetadataRoute } from 'next';
-import { STATE_LIEN_RULES } from '@/lib/statutoryRules';
+import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://subshieldhq.com';
+  const baseUrl = "https://www.subshieldhq.com";
+  const now = new Date();
 
-  // Base landing page
-  const routes: MetadataRoute.Sitemap = [
+  return [
     {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+      url: `${baseUrl}/`,
+      lastModified: now,
+      changeFrequency: "weekly",
       priority: 1.0,
     },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
   ];
-
-  // Optional: add entries for individual state filters or pages
-  const stateRoutes: MetadataRoute.Sitemap = Object.keys(STATE_LIEN_RULES).map((stateCode) => ({
-    url: `${baseUrl}?state=${stateCode.toLowerCase()}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }));
-
-  return [...routes, ...stateRoutes];
 }
