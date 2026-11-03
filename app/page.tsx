@@ -1,492 +1,499 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo } from 'react';
-import { STATE_LIEN_RULES } from '@/lib/statutoryRules';
-import { generateIcsFile } from '@/lib/generateIcs';
-import { 
-  Calculator, 
-  ShieldAlert, 
-  CalendarCheck, 
-  Download, 
-  CheckCircle2, 
-  Lock,
-  ArrowRight,
-  FileCheck
-} from 'lucide-react';
-
-const STRIPE_CHECKOUT_URL = 'https://buy.stripe.com/28E14n6FPd3fgpK8K52VG00';
+import { useState } from "react";
+import Link from "next/link";
+import { statutoryRules } from "@/lib/statutoryRules";
+import { generateIcsContent } from "@/lib/generateIcs";
 
 export default function Home() {
-  // Bid Estimator Inputs
-  const [materialsCost, setMaterialsCost] = useState<number>(4500);
-  const [laborHours, setLaborHours] = useState<number>(65);
-  const [hourlyWage, setHourlyWage] = useState<number>(38);
-  const [laborBurdenPercent, setLaborBurdenPercent] = useState<number>(24);
+  // --- Bid Estimator State ---
+  const [directLabor, setDirectLabor] = useState<number>(2500);
+  const [burdenPercent, setBurdenPercent] = useState<number>(28);
+  const [materials, setMaterials] = useState<number>(3200);
+  const [equipment, setEquipment] = useState<number>(600);
   const [overheadPercent, setOverheadPercent] = useState<number>(15);
-  const [profitMarginPercent, setProfitMarginPercent] = useState<number>(20);
+  const [marginPercent, setMarginPercent] = useState<number>(20);
 
-  // Lien Tracker Inputs
-  const [projectName, setProjectName] = useState<string>('Main St Commercial Plaza');
-  const [selectedState, setSelectedState] = useState<string>('SC');
-  const [firstWorkDate, setFirstWorkDate] = useState<string>(
-    new Date().toISOString().slice(0, 10)
-  );
-  const [lastWorkDate, setLastWorkDate] = useState<string>(
-    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
-  );
+  // --- Lien Calculation State ---
+  const [selectedState, setSelectedState] = useState<string>("SC");
+  const [firstWorkDate, setFirstWorkDate] = useState<string>("");
+  const [lastWorkDate, setLastWorkDate] = useState<string>("");
 
-  // Sorted list of jurisdictions for the dropdown
-  const sortedStateCodes = useMemo(() => {
-    return Object.keys(STATE_LIEN_RULES).sort((a, b) =>
-      STATE_LIEN_RULES[a].name.localeCompare(STATE_LIEN_RULES[b].name)
-    );
-  }, []);
+  // Bid calculations
+  const burdenedLabor = directLabor * (1 + burdenPercent / 100);
+  const directCost = burdenedLabor + materials + equipment;
+  const overheadCost = directCost * (overheadPercent / 100);
+  const totalCost = directCost + overheadCost;
+  // Price based on target Gross Margin %: Price = Total Cost / (1 - Margin%)
+  const targetPrice =
+    marginPercent < 100 ? totalCost / (1 - marginPercent / 100) : totalCost;
+  const projectedProfit = targetPrice - totalCost;
 
-  // Bid Math: Cost-Plus Markup & Burden calculations
-  const calculations = useMemo(() => {
-    const rawLaborCost = (laborHours || 0) * (hourlyWage || 0);
-    const burdenedLaborCost = rawLaborCost * (1 + (laborBurdenPercent || 0) / 100);
-    const directJobCost = (materialsCost || 0) + burdenedLaborCost;
-    const overheadCost = directJobCost * ((overheadPercent || 0) / 100);
-    const totalJobCost = directJobCost + overheadCost;
-    
-    // Target price based on gross margin: Cost / (1 - Margin%)
-    const safeMargin = Math.min(profitMarginPercent || 0, 99) / 100;
-    const targetBidPrice = safeMargin < 1 
-      ? totalJobCost / (1 - safeMargin) 
-      : totalJobCost * 1.5;
-    const netProfit = targetBidPrice - totalJobCost;
+  // Lien rule calculations
+  const currentStateRule =
+    statutoryRules.find((r) => r.stateCode === selectedState) ||
+    statutoryRules[0];
 
-    return {
-      rawLaborCost,
-      burdenedLaborCost,
-      directJobCost,
-      overheadCost,
-      totalJobCost,
-      targetBidPrice,
-      netProfit,
-    };
-  }, [materialsCost, laborHours, hourlyWage, laborBurdenPercent, overheadPercent, profitMarginPercent]);
+  const calculateDeadlines = () => {
+    let prelimDate: Date | null = null;
+    let lienDate: Date | null = null;
 
-  // Statutory Date Math
-  const statutoryData = useMemo(() => {
-    const stateRule = STATE_LIEN_RULES[selectedState] || STATE_LIEN_RULES['SC'];
-    
-    let preliminaryDeadline: string | null = null;
-    if (stateRule.preliminaryNoticeDays && firstWorkDate) {
-      const pDate = new Date(firstWorkDate);
-      pDate.setDate(pDate.getDate() + stateRule.preliminaryNoticeDays);
-      preliminaryDeadline = pDate.toISOString().slice(0, 10);
+    if (firstWorkDate && currentStateRule?.prelimDays) {
+      const d = new Date(firstWorkDate);
+      d.setDate(d.getDate() + currentStateRule.prelimDays);
+      prelimDate = d;
     }
 
-    let lienDeadline = '';
-    if (lastWorkDate) {
-      const lDate = new Date(lastWorkDate);
-      lDate.setDate(lDate.getDate() + stateRule.lienFilingDays);
-      lienDeadline = lDate.toISOString().slice(0, 10);
+    if (lastWorkDate && currentStateRule?.lienDays) {
+      const d = new Date(lastWorkDate);
+      d.setDate(d.getDate() + currentStateRule.lienDays);
+      lienDate = d;
     }
 
-    return {
-      rule: stateRule,
-      preliminaryDeadline,
-      lienDeadline,
-    };
-  }, [selectedState, firstWorkDate, lastWorkDate]);
+    return { prelimDate, lienDate };
+  };
+
+  const { prelimDate, lienDate } = calculateDeadlines();
 
   const handleDownloadCalendar = () => {
-    const icsContent = generateIcsFile(
-      projectName || 'Job',
-      statutoryData.preliminaryDeadline,
-      statutoryData.lienDeadline
+    if (!prelimDate && !lienDate) {
+      alert("Please enter work dates first to calculate deadlines.");
+      return;
+    }
+
+    const icsString = generateIcsContent({
+      stateName: currentStateRule.stateName,
+      prelimDate: prelimDate ? prelimDate.toISOString().split("T")[0] : null,
+      lienDate: lienDate ? lienDate.toISOString().split("T")[0] : null,
+    });
+
+    const blob = new Blob([icsString], { type: "text/calendar;charset=utf-8" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `${currentStateRule.stateCode}_SubShield_Deadlines.ics`
     );
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.setAttribute('download', `${(projectName || 'subcontractor-job').toLowerCase().replace(/\s+/g, '-')}-lien-deadlines.ics`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const handleUpgradeClick = () => {
-    window.location.href = STRIPE_CHECKOUT_URL;
-  };
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-amber-500 selection:text-black">
-      {/* Navigation Header */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      {/* --- HEADER --- */}
       <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-amber-500 p-2 rounded-lg text-slate-950 font-black shadow-md shadow-amber-500/20">
-              <ShieldAlert className="w-5 h-5" />
-            </div>
+          <div className="flex items-center gap-2">
             <span className="font-extrabold text-xl tracking-tight text-white">
-              SubShield<span className="text-amber-500">HQ</span>
+              Sub<span className="text-amber-500">Shield</span>HQ
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+              Free Estimator
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-block text-xs font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-3 py-1 rounded-full">
-              50-State Statutory Engine Live
-            </span>
-            <button 
-              onClick={handleUpgradeClick}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg border border-slate-700 transition"
+
+          <nav className="flex items-center gap-6">
+            <a
+              href="#bid-calculator"
+              className="text-sm font-medium text-slate-300 hover:text-white transition"
             >
-              Sign In
-            </button>
-          </div>
+              Bid Calculator
+            </a>
+            <a
+              href="#deadline-calculator"
+              className="text-sm font-medium text-slate-300 hover:text-white transition"
+            >
+              Lien Deadlines
+            </a>
+            <a
+              href="#bid-toolkit"
+              className="text-sm font-semibold text-amber-500 hover:text-amber-400 transition"
+            >
+              Bid Toolkit
+            </a>
+            <a
+              href="#bid-calculator"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 transition"
+            >
+              Launch Tool
+            </a>
+          </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="pt-12 pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold mb-4 uppercase tracking-wider">
-          Specialty Subcontractor Compliance Suite
+      {/* --- HERO SECTION --- */}
+      <section className="py-16 md:py-20 border-b border-slate-800/80 bg-gradient-to-b from-slate-900 to-slate-950">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wide uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+            Transparent Subcontractor Math
+          </span>
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-6">
+            Bid With Confidence. <br className="hidden sm:inline" />
+            Protect Your Margin & Cash Flow.
+          </h1>
+          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+            An open-access estimator for trade contractors. Factor in true labor
+            burden, recover actual overhead, protect target profit margins, and
+            check standard statutory notice timelines.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <a
+              href="#bid-calculator"
+              className="px-6 py-3 rounded-lg font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-lg shadow-amber-500/10"
+            >
+              Open Bid Estimator
+            </a>
+            <a
+              href="#deadline-calculator"
+              className="px-6 py-3 rounded-lg font-semibold bg-slate-800 hover:bg-slate-700 text-white transition border border-slate-700"
+            >
+              Check State Deadlines
+            </a>
+          </div>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
-          Accurate Labor Burden Bidding. <br className="hidden sm:inline" />
-          <span className="text-amber-500">Bulletproof Mechanics Lien Deadlines.</span>
-        </h1>
-        <p className="mt-4 text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-          Price commercial bids with realistic wage markups and automatically calculate statutory preliminary notice deadlines across all 50 US jurisdictions.
-        </p>
       </section>
 
-      {/* Main Interactive Tool Grid */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Bid Estimator Section (7 Columns) */}
-          <div className="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-            <div className="flex items-center gap-3 pb-6 border-b border-slate-800">
-              <Calculator className="w-6 h-6 text-amber-500" />
-              <div>
-                <h2 className="text-lg font-bold text-white">Subcontractor Bid Estimator</h2>
-                <p className="text-xs text-slate-400">Calculate burdened payroll costs, overhead absorption, and target margins.</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                  Materials & Equipment ($)
-                </label>
-                <input
-                  type="number"
-                  value={materialsCost || ''}
-                  onChange={(e) => setMaterialsCost(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-white font-medium focus:outline-none transition"
-                  placeholder="0.00"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                  Total Crew Hours
-                </label>
-                <input
-                  type="number"
-                  value={laborHours || ''}
-                  onChange={(e) => setLaborHours(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-white font-medium focus:outline-none transition"
-                  placeholder="e.g. 60"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                  Base Hourly Wage ($/hr)
-                </label>
-                <input
-                  type="number"
-                  value={hourlyWage || ''}
-                  onChange={(e) => setHourlyWage(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-white font-medium focus:outline-none transition"
-                  placeholder="35"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                  Labor Burden Rate (%)
-                </label>
-                <input
-                  type="number"
-                  value={laborBurdenPercent || ''}
-                  onChange={(e) => setLaborBurdenPercent(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-white font-medium focus:outline-none transition"
-                  placeholder="24"
-                />
-                <span className="text-[10px] text-slate-500 mt-1 block">Includes FICA, Workers Comp, FUTA/SUTA</span>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                  Overhead Recovery (%)
-                </label>
-                <input
-                  type="number"
-                  value={overheadPercent || ''}
-                  onChange={(e) => setOverheadPercent(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-white font-medium focus:outline-none transition"
-                  placeholder="15"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                  Target Profit Margin (%)
-                </label>
-                <input
-                  type="number"
-                  value={profitMarginPercent || ''}
-                  onChange={(e) => setProfitMarginPercent(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-white font-medium focus:outline-none transition"
-                  placeholder="20"
-                />
-              </div>
-            </div>
-
-            {/* Calculations Breakdown Grid */}
-            <div className="mt-8 bg-slate-950/70 border border-slate-800/80 rounded-xl p-5">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                <div>
-                  <span className="text-slate-500 text-xs block">Burdened Labor</span>
-                  <span className="text-base font-bold text-slate-200">
-                    ${calculations.burdenedLaborCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-xs block">Direct Job Cost</span>
-                  <span className="text-base font-bold text-slate-200">
-                    ${calculations.directJobCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-xs block">Allocated Overhead</span>
-                  <span className="text-base font-bold text-slate-200">
-                    ${calculations.overheadCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-xs block">Net Profit</span>
-                  <span className="text-base font-bold text-emerald-400">
-                    +${calculations.netProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-5 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                  <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Recommended Total Bid</span>
-                  <p className="text-3xl font-black text-amber-400">
-                    ${calculations.targetBidPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </p>
-                </div>
-                <button 
-                  onClick={() => alert('PDF Estimate Generation Ready: Connect your client-side PDF export logic here.')}
-                  className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 border border-slate-700 transition"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Export Formal Bid
-                </button>
-              </div>
-            </div>
+      {/* --- MAIN TOOL CONTAINER --- */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full space-y-16">
+        {/* --- SECTION 1: BID ESTIMATOR --- */}
+        <section id="bid-calculator" className="scroll-mt-20">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <span className="text-amber-500">01.</span> Direct Cost & Margin
+              Calculator
+            </h2>
+            <p className="text-slate-400 text-sm">
+              All calculations run client-side in your browser. Your rates and
+              project values are never saved or sent to any server.
+            </p>
           </div>
 
-          {/* Lien Protection & Calendar Engine (5 Columns) */}
-          <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-3 pb-6 border-b border-slate-800">
-                <ShieldAlert className="w-6 h-6 text-amber-500" />
-                <div>
-                  <h2 className="text-lg font-bold text-white">Lien Protection Engine</h2>
-                  <p className="text-xs text-slate-400">Statutory notice requirements and mechanics lien cutoff dates.</p>
-                </div>
-              </div>
-
-              <div className="space-y-4 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Input Column */}
+            <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                    Project / Job Name
+                    Direct Wages ($)
                   </label>
                   <input
-                    type="text"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-white font-medium focus:outline-none transition"
+                    type="number"
+                    value={directLabor || ""}
+                    onChange={(e) => setDirectLabor(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="2500"
+                  />
+                  <span className="text-xs text-slate-500 mt-1 block">
+                    Base field hourly or trade labor
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Labor Burden Rate (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={burdenPercent || ""}
+                    onChange={(e) => setBurdenPercent(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="28"
+                  />
+                  <span className="text-xs text-slate-500 mt-1 block">
+                    FICA, FUTA, SUTA, workers' comp & benefits
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Direct Materials ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={materials || ""}
+                    onChange={(e) => setMaterials(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="3200"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                    Project Jurisdiction (All 50 States + DC)
+                    Equipment / Rentals ($)
                   </label>
-                  <select
-                    value={selectedState}
-                    onChange={(e) => setSelectedState(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-white font-medium focus:outline-none transition"
-                  >
-                    {sortedStateCodes.map((stCode) => (
-                      <option key={stCode} value={stCode}>
-                        {STATE_LIEN_RULES[stCode].name} ({stCode})
-                      </option>
-                    ))}
-                  </select>
+                  <input
+                    type="number"
+                    value={equipment || ""}
+                    onChange={(e) => setEquipment(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="600"
+                  />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                      First Day On Job
-                    </label>
-                    <input
-                      type="date"
-                      value={firstWorkDate}
-                      onChange={(e) => setFirstWorkDate(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2 text-white text-xs font-medium focus:outline-none transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                      Est. Completion Date
-                    </label>
-                    <input
-                      type="date"
-                      value={lastWorkDate}
-                      onChange={(e) => setLastWorkDate(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2 text-white text-xs font-medium focus:outline-none transition"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Statutory Output Details */}
-              <div className="mt-6 bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-3">
-                <div className="flex items-start justify-between">
-                  <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Required Notice</span>
-                  <span className="text-[11px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-medium">
-                    {statutoryData.rule.name} Statute
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Company Overhead Recovery (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={overheadPercent || ""}
+                    onChange={(e) => setOverheadPercent(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="15"
+                  />
+                  <span className="text-xs text-slate-500 mt-1 block">
+                    Shop, truck, insurance, software costs
                   </span>
                 </div>
-                <p className="text-xs font-medium text-slate-200">
-                  {statutoryData.rule.statutoryNoticeName}
-                </p>
 
-                <div className="pt-2 border-t border-slate-800 grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="text-slate-500 block">Notice Deadline:</span>
-                    <span className="font-bold text-amber-400 text-sm">
-                      {statutoryData.preliminaryDeadline || 'Not Required'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Final Lien Cutoff:</span>
-                    <span className="font-bold text-rose-400 text-sm">
-                      {statutoryData.lienDeadline}
-                    </span>
-                  </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Target Gross Margin (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={marginPercent || ""}
+                    onChange={(e) => setMarginPercent(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="20"
+                  />
+                  <span className="text-xs text-slate-500 mt-1 block">
+                    Target gross profit share of final contract
+                  </span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed italic">
-                  *{statutoryData.rule.notes}
-                </p>
               </div>
             </div>
 
-            {/* Calendar (.ics) Download Button */}
-            <div className="mt-6 pt-4 border-t border-slate-800">
-              <button
-                onClick={handleDownloadCalendar}
-                className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition active:scale-[0.99]"
-              >
-                <CalendarCheck className="w-5 h-5" />
-                Sync Deadlines to Calendar (.ics)
-              </button>
-              <p className="text-center text-[10px] text-slate-500 mt-2">
-                Adds 14-day and 5-day warning triggers to Outlook, Google Calendar, and Apple Calendar.
-              </p>
+            {/* Bid Summary Card */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">
+                  Bid Price Breakdown
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Burdened Labor:</span>
+                    <span className="font-mono text-white">
+                      ${burdenedLabor.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Direct Cost Total:</span>
+                    <span className="font-mono text-white">
+                      ${directCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Overhead Added:</span>
+                    <span className="font-mono text-white">
+                      ${overheadCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Break-Even Cost:</span>
+                    <span className="font-mono text-white font-medium">
+                      ${totalCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800 text-emerald-400">
+                    <span>Projected Net Profit:</span>
+                    <span className="font-mono font-medium">
+                      +${projectedProfit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-800">
+                <span className="text-xs uppercase text-slate-400 font-semibold tracking-wider block mb-1">
+                  Recommended Bid Price
+                </span>
+                <div className="text-3xl font-extrabold text-amber-400 font-mono">
+                  ${targetPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Formula: Break-Even Cost ÷ (1 - Margin%). Covers direct costs,
+                  recovers overhead, and delivers specified gross margin.
+                </p>
+              </div>
             </div>
-          </div>
-
-        </div>
-
-        {/* Feature Highlights Grid */}
-        <section className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900/50 border border-slate-800/80 p-6 rounded-2xl">
-            <FileCheck className="w-8 h-8 text-amber-500 mb-3" />
-            <h3 className="text-base font-bold text-white">Full 50-State Statutory Logic</h3>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Every state enforces distinct preliminary notice triggers, lookback windows, and filing cutoffs. Keep your lien rights intact without legal consult fees.
-            </p>
-          </div>
-
-          <div className="bg-slate-900/50 border border-slate-800/80 p-6 rounded-2xl">
-            <Calculator className="w-8 h-8 text-amber-500 mb-3" />
-            <h3 className="text-base font-bold text-white">Real Labor Burden Factoring</h3>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Bidding wages alone bleeds contractor profit. Account for workers' comp, FICA, unemployment insurance, and overhead on every single job.
-            </p>
-          </div>
-
-          <div className="bg-slate-900/50 border border-slate-800/80 p-6 rounded-2xl">
-            <CalendarCheck className="w-8 h-8 text-amber-500 mb-3" />
-            <h3 className="text-base font-bold text-white">Zero-Friction Calendar Sync</h3>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Download standard .ics calendar appointments with automatic reminder alarms to ensure cutoff dates never pass unnoticed.
-            </p>
           </div>
         </section>
 
-        {/* SaaS Upsell Section */}
-        <section className="mt-16 bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/20 border border-slate-800 rounded-3xl p-8 lg:p-12 text-center max-w-4xl mx-auto shadow-2xl">
-          <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs uppercase tracking-widest font-black px-3.5 py-1 rounded-full">
-            SubShield Pro
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-4">
-            Automated Deadline Protection For $19/Month
-          </h2>
-          <p className="text-slate-400 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Stop tracking commercial job dates on whiteboards. SubShield Pro automatically monitors your jobs and fires SMS warnings before notice windows lapse.
-          </p>
-
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-            <div className="bg-slate-950/80 border border-slate-800/80 p-4 rounded-xl">
-              <CheckCircle2 className="w-5 h-5 text-amber-500 mb-2" />
-              <h4 className="text-sm font-bold text-white">30 Active Projects</h4>
-              <p className="text-xs text-slate-400 mt-1">Track jobs across multiple general contractors and states simultaneously.</p>
-            </div>
-            <div className="bg-slate-950/80 border border-slate-800/80 p-4 rounded-xl">
-              <CheckCircle2 className="w-5 h-5 text-amber-500 mb-2" />
-              <h4 className="text-sm font-bold text-white">Automated SMS Alarms</h4>
-              <p className="text-xs text-slate-400 mt-1">Direct alerts sent to your phone 14, 7, and 2 days before statutory expiration.</p>
-            </div>
-            <div className="bg-slate-950/80 border border-slate-800/80 p-4 rounded-xl">
-              <CheckCircle2 className="w-5 h-5 text-amber-500 mb-2" />
-              <h4 className="text-sm font-bold text-white">Certified Mail Notices</h4>
-              <p className="text-xs text-slate-400 mt-1">State-compliant Preliminary Notice and Notice to Owner forms ready to sign and send.</p>
-            </div>
+        {/* --- SECTION 2: LIEN DEADLINE CALCULATOR --- */}
+        <section id="deadline-calculator" className="scroll-mt-20">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <span className="text-amber-500">02.</span> Mechanics Lien & Notice
+              Calendar Estimator
+            </h2>
+            <p className="text-slate-400 text-sm">
+              Look up standard statutory timeline windows by jurisdiction and
+              export calendar reminder alerts (.ics).
+            </p>
           </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button 
-              onClick={handleUpgradeClick}
-              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-base px-8 py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-            >
-              <Lock className="w-4 h-4" />
-              Upgrade to Pro ($19/mo)
-            </button>
-            <span className="text-xs text-slate-500">Cancel anytime • Instant activation</span>
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 lg:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                  Project Jurisdiction
+                </label>
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                >
+                  {statutoryRules.map((rule) => (
+                    <option key={rule.stateCode} value={rule.stateCode}>
+                      {rule.stateName} ({rule.stateCode})
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs text-slate-500 mt-1 block">
+                  Select where project work is located
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                  First Day of Work / Material
+                </label>
+                <input
+                  type="date"
+                  value={firstWorkDate}
+                  onChange={(e) => setFirstWorkDate(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">
+                  Used for preliminary notice trigger
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                  Last Day of Work (or Est. Completion)
+                </label>
+                <input
+                  type="date"
+                  value={lastWorkDate}
+                  onChange={(e) => setLastWorkDate(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">
+                  Used for lien filing deadline trigger
+                </span>
+              </div>
+            </div>
+
+            {/* Timeline Results */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-lg bg-slate-950 border border-slate-800 mb-6">
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Preliminary Notice Window
+                </span>
+                <div className="text-xl font-bold text-white mt-1">
+                  {prelimDate ? prelimDate.toLocaleDateString() : "Enter First Work Date"}
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {currentStateRule?.prelimRuleText || "Standard state rule window."}
+                </p>
+              </div>
+
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Lien Filing Deadline
+                </span>
+                <div className="text-xl font-bold text-white mt-1">
+                  {lienDate ? lienDate.toLocaleDateString() : "Enter Last Work Date"}
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {currentStateRule?.lienRuleText || "Standard state rule window."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800">
+              <p className="text-xs text-slate-400 max-w-xl">
+                <strong>Legal Disclaimer:</strong> Mechanics lien laws vary by
+                claimant tier, project type, and contract terms. These dates are
+                informational approximations and do not constitute formal legal
+                counsel. Always consult a qualified construction attorney to
+                protect your lien rights.
+              </p>
+              <button
+                onClick={handleDownloadCalendar}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-sm transition shrink-0"
+              >
+                Download Calendar Reminders (.ics)
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* --- SECTION 3: REVENUE / TOOLKIT OFFER --- */}
+        <section id="bid-toolkit" className="scroll-mt-20">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-8 lg:p-10 relative overflow-hidden">
+            <div className="max-w-3xl">
+              <span className="inline-block px-3 py-1 mb-3 text-xs font-semibold tracking-wide uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+                Subcontractor Offline Toolkit
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+                Want to run your estimating and job-costing in Excel or Google
+                Sheets?
+              </h2>
+              <p className="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed">
+                Take our proven bid math with you. The SubShield Contractor Bid
+                Pack includes a pre-configured Labor Burden Calculator, Overhead
+                Recovery Matrix, Proposal Scope & Exclusion Sheets, and a Change
+                Order Log.
+              </p>
+              <div className="flex flex-wrap items-center gap-4">
+                <a
+                  href="#contact"
+                  className="px-6 py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition"
+                >
+                  Join Pro Template Waitlist (Free Sample)
+                </a>
+                <span className="text-xs text-slate-400">
+                  No subscription required • One-time download
+                </span>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-10 px-4 text-center text-xs text-slate-600">
-        <p className="max-w-2xl mx-auto">
-          SubShieldHQ provides estimate calculators and statutory deadline mapping for informational purposes only. Statutory rules may vary based on contract terms, tiers, and notice recordings. Not legal advice.
-        </p>
-        <p className="mt-4">© {new Date().getFullYear()} SubShieldHQ. All rights reserved.</p>
+      {/* --- FOOTER --- */}
+      <footer className="border-t border-slate-800 bg-slate-950 py-10 mt-16 text-slate-400 text-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <span className="font-bold text-white text-base">
+              Sub<span className="text-amber-500">Shield</span>HQ
+            </span>
+            <p className="text-xs text-slate-500 mt-1">
+              Independent estimating & workflow utilities for specialty trade
+              subcontractors.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-6 text-xs text-slate-400">
+            <Link href="/about" className="hover:text-white transition">
+              About & Methodology
+            </Link>
+            <Link href="/privacy" className="hover:text-white transition">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-white transition">
+              Terms of Service
+            </Link>
+            <Link href="/contact" className="hover:text-white transition">
+              Contact & Corrections
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
