@@ -24,7 +24,6 @@ export default function Home() {
   const directCost = burdenedLabor + materials + equipment;
   const overheadCost = directCost * (overheadPercent / 100);
   const totalCost = directCost + overheadCost;
-  // Price based on target Gross Margin %: Price = Total Cost / (1 - Margin%)
   const targetPrice =
     marginPercent < 100 ? totalCost / (1 - marginPercent / 100) : totalCost;
   const projectedProfit = targetPrice - totalCost;
@@ -32,24 +31,24 @@ export default function Home() {
   // Convert dictionary object to an array of rules safely
   const rulesArray: StateLienRule[] = Object.values(statutoryRules);
 
-  // Lien rule calculations
+  // Lien rule calculations using correct interface properties
   const currentStateRule: StateLienRule =
-    rulesArray.find((r: StateLienRule) => r.stateCode === selectedState) ||
+    rulesArray.find((r: StateLienRule) => r.state === selectedState) ||
     rulesArray[0];
 
   const calculateDeadlines = () => {
     let prelimDate: Date | null = null;
     let lienDate: Date | null = null;
 
-    if (firstWorkDate && currentStateRule?.prelimDays) {
+    if (firstWorkDate && currentStateRule?.preliminaryNoticeDays) {
       const d = new Date(firstWorkDate);
-      d.setDate(d.getDate() + currentStateRule.prelimDays);
+      d.setDate(d.getDate() + currentStateRule.preliminaryNoticeDays);
       prelimDate = d;
     }
 
-    if (lastWorkDate && currentStateRule?.lienDays) {
+    if (lastWorkDate && currentStateRule?.lienFilingDays) {
       const d = new Date(lastWorkDate);
-      d.setDate(d.getDate() + currentStateRule.lienDays);
+      d.setDate(d.getDate() + currentStateRule.lienFilingDays);
       lienDate = d;
     }
 
@@ -76,7 +75,7 @@ export default function Home() {
     link.href = url;
     link.setAttribute(
       "download",
-      `${currentStateRule.stateCode}_SubShield_Deadlines.ics`
+      `${currentStateRule.state}_SubShield_Deadlines.ics`
     );
     document.body.appendChild(link);
     link.click();
@@ -350,8 +349,8 @@ export default function Home() {
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
                 >
                   {rulesArray.map((rule: StateLienRule) => (
-                    <option key={rule.stateCode} value={rule.stateCode}>
-                      {rule.stateName} ({rule.stateCode})
+                    <option key={rule.state} value={rule.state}>
+                      {rule.stateName} ({rule.state})
                     </option>
                   ))}
                 </select>
@@ -401,7 +400,7 @@ export default function Home() {
                   {prelimDate ? prelimDate.toLocaleDateString() : "Enter First Work Date"}
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                  {currentStateRule?.prelimRuleText || "Standard state rule window."}
+                  {currentStateRule?.notes || currentStateRule?.statutoryNoticeName || "Standard state rule window."}
                 </p>
               </div>
 
@@ -413,7 +412,7 @@ export default function Home() {
                   {lienDate ? lienDate.toLocaleDateString() : "Enter Last Work Date"}
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                  {currentStateRule?.lienRuleText || "Standard state rule window."}
+                  {currentStateRule?.notes || currentStateRule?.statutoryNoticeName || "Standard state rule window."}
                 </p>
               </div>
             </div>
