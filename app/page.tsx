@@ -29,10 +29,13 @@ export default function Home() {
     marginPercent < 100 ? totalCost / (1 - marginPercent / 100) : totalCost;
   const projectedProfit = targetPrice - totalCost;
 
+  // Convert dictionary object to an array of rules safely
+  const rulesArray: StateLienRule[] = Object.values(statutoryRules);
+
   // Lien rule calculations
   const currentStateRule: StateLienRule =
-    statutoryRules.find((r: StateLienRule) => r.stateCode === selectedState) ||
-    statutoryRules[0];
+    rulesArray.find((r: StateLienRule) => r.stateCode === selectedState) ||
+    rulesArray[0];
 
   const calculateDeadlines = () => {
     let prelimDate: Date | null = null;
@@ -346,7 +349,7 @@ export default function Home() {
                   onChange={(e) => setSelectedState(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
                 >
-                  {statutoryRules.map((rule: StateLienRule) => (
+                  {rulesArray.map((rule: StateLienRule) => (
                     <option key={rule.stateCode} value={rule.stateCode}>
                       {rule.stateName} ({rule.stateCode})
                     </option>
