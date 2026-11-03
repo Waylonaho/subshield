@@ -31,9 +31,9 @@ export default function Home() {
   // Convert dictionary object to an array of rules safely
   const rulesArray: StateLienRule[] = Object.values(statutoryRules);
 
-  // Lien rule calculations using correct interface properties
+  // Lien rule calculations using correct interface properties ('code' instead of 'state')
   const currentStateRule: StateLienRule =
-    rulesArray.find((r: StateLienRule) => r.state === selectedState) ||
+    rulesArray.find((r: StateLienRule) => r.code === selectedState) ||
     rulesArray[0];
 
   const calculateDeadlines = () => {
@@ -63,11 +63,12 @@ export default function Home() {
       return;
     }
 
-    const icsString = generateIcsContent({
-      stateName: currentStateRule.stateName,
-      prelimDate: prelimDate ? prelimDate.toISOString().split("T")[0] : null,
-      lienDate: lienDate ? lienDate.toISOString().split("T")[0] : null,
-    });
+    // Fixed: Passing the 3 expected arguments to generateIcsContent
+    const icsString = generateIcsContent(
+      `${currentStateRule.name} Project`,
+      prelimDate ? prelimDate.toISOString().split("T")[0] : null,
+      lienDate ? lienDate.toISOString().split("T")[0] : ""
+    );
 
     const blob = new Blob([icsString], { type: "text/calendar;charset=utf-8" });
     const url = window.URL.createObjectURL(blob);
@@ -75,7 +76,7 @@ export default function Home() {
     link.href = url;
     link.setAttribute(
       "download",
-      `${currentStateRule.state}_SubShield_Deadlines.ics`
+      `${currentStateRule.code}_SubShield_Deadlines.ics`
     );
     document.body.appendChild(link);
     link.click();
@@ -349,8 +350,8 @@ export default function Home() {
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
                 >
                   {rulesArray.map((rule: StateLienRule) => (
-                    <option key={rule.state} value={rule.state}>
-                      {rule.stateName} ({rule.state})
+                    <option key={rule.code} value={rule.code}>
+                      {rule.name} ({rule.code})
                     </option>
                   ))}
                 </select>
