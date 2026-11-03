@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { STATE_LIEN_RULES as statutoryRules } from "@/lib/statutoryRules";
+import { STATE_LIEN_RULES as statutoryRules, StateLienRule } from "@/lib/statutoryRules";
 import { generateIcsFile as generateIcsContent } from "@/lib/generateIcs";
 
 export default function Home() {
@@ -30,8 +30,8 @@ export default function Home() {
   const projectedProfit = targetPrice - totalCost;
 
   // Lien rule calculations
-  const currentStateRule =
-    statutoryRules.find((r) => r.stateCode === selectedState) ||
+  const currentStateRule: StateLienRule =
+    statutoryRules.find((r: StateLienRule) => r.stateCode === selectedState) ||
     statutoryRules[0];
 
   const calculateDeadlines = () => {
@@ -346,7 +346,7 @@ export default function Home() {
                   onChange={(e) => setSelectedState(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
                 >
-                  {statutoryRules.map((rule) => (
+                  {statutoryRules.map((rule: StateLienRule) => (
                     <option key={rule.stateCode} value={rule.stateCode}>
                       {rule.stateName} ({rule.stateCode})
                     </option>
