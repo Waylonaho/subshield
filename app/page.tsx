@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { statutoryRules } from "@/lib/statutoryRules";
+import { STATE_LIEN_RULES as statutoryRules } from "@/lib/statutoryRules";
 import { generateIcsContent } from "@/lib/generateIcs";
 
 export default function Home() {
