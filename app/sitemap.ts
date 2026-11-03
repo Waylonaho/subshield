@@ -11,6 +11,32 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1.0,
     },
+    // --- Phase 2 SEO Cluster ---
+    {
+      url: `${baseUrl}/tools/labor-burden-calculator`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/guides/markup-vs-margin-construction`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/templates/subcontractor-bid-template`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // --- Trust & Compliance Pages ---
+    {
+      url: `${baseUrl}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
     {
       url: `${baseUrl}/privacy`,
       lastModified: now,
@@ -22,12 +48,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.4,
     },
     {
       url: `${baseUrl}/contact`,
