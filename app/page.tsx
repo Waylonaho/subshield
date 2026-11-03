@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { STATE_LIEN_RULES as statutoryRules } from "@/lib/statutoryRules";
-import { generateIcsContent } from "@/lib/generateIcs";
+import { generateIcsFile as generateIcsContent } from "@/lib/generateIcs";
 
 export default function Home() {
   // --- Bid Estimator State ---
