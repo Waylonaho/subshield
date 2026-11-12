@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     // 1. Sends lead alert to you
     await resend.emails.send({
-      from: "SubShield Leads <onboarding@resend.dev>",
+      from: "SubShield Leads <leads@subshieldhq.com>",
       to: process.env.MY_EMAIL || "waylonaho@gmail.com",
       subject: "🚨 New SubShieldHQ Contractor Lead!",
       text: `A contractor just downloaded your SubShield Bid Estimator Template:\n\nEmail: ${email}`,
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
     // 2. Sends the real Google Sheet copy link + Pro upgrade upsell to the contractor
     await resend.emails.send({
-      from: "SubShieldHQ <onboarding@resend.dev>",
+      from: "SubShieldHQ <templates@subshieldhq.com>",
       to: email,
       subject: "Your Free Subcontractor Bid & Labor Burden Template",
       html: `
