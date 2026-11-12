@@ -1,0 +1,2374 @@
+=== REPOSITORY STRUCTURE ===
+  - AGENTS.md
+  - CLAUDE.md
+  - README.md
+  - next.config.ts
+  - package.json
+  - postcss.config.mjs
+  - tsconfig.json
+  - app/globals.css
+  - app/layout.tsx
+  - app/page.tsx
+  - app/robots.ts
+  - app/sitemap.ts
+  - app/about/page.tsx
+  - app/api/leads/route.ts
+  - app/contact/page.tsx
+  - app/guides/markup-vs-margin-construction/page.tsx
+  - app/privacy/page.tsx
+  - app/templates/subcontractor-bid-template/page.tsx
+  - app/terms/page.tsx
+  - app/tools/labor-burden-calculator/page.tsx
+  - lib/generateIcs.ts
+  - lib/statutoryRules.ts
+
+==================================================
+
+--- START FILE: AGENTS.md ---
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+--- END FILE: AGENTS.md ---
+
+--- START FILE: CLAUDE.md ---
+@AGENTS.md
+
+--- END FILE: CLAUDE.md ---
+
+--- START FILE: README.md ---
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+--- END FILE: README.md ---
+
+--- START FILE: next.config.ts ---
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
+};
+
+export default nextConfig;
+
+--- END FILE: next.config.ts ---
+
+--- START FILE: package.json ---
+{
+  "name": "subshield",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "resend": "^3.2.0",
+    "lucide-react": "^1.48.0",
+    "next": "16.3.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
+
+--- END FILE: package.json ---
+
+--- START FILE: postcss.config.mjs ---
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+
+--- END FILE: postcss.config.mjs ---
+
+--- START FILE: tsconfig.json ---
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+
+--- END FILE: tsconfig.json ---
+
+--- START FILE: app/globals.css ---
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+--- END FILE: app/globals.css ---
+
+--- START FILE: app/layout.tsx ---
+import type { Metadata } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://www.subshieldhq.com"),
+  title: {
+    default: "Subcontractor Bid Calculator & Labor Burden Tool | SubShieldHQ",
+    template: "%s | SubShieldHQ",
+  },
+  description:
+    "Free subcontractor estimating tools. Calculate fully burdened labor rates, overhead recovery, markup vs. margin, and target project bids with your own assumptions.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Subcontractor Bid Calculator & Labor Burden Tool | SubShieldHQ",
+    description:
+      "Estimate burdened labor, job costs, and target bids with transparent contractor math.",
+    url: "https://www.subshieldhq.com",
+    siteName: "SubShieldHQ",
+    locale: "en_US",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className="antialiased bg-slate-950 text-slate-100">
+        {children}
+      </body>
+    </html>
+  );
+}
+
+--- END FILE: app/layout.tsx ---
+
+--- START FILE: app/page.tsx ---
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { STATE_LIEN_RULES as statutoryRules, StateLienRule } from "@/lib/statutoryRules";
+import { generateIcsFile as generateIcsContent } from "@/lib/generateIcs";
+
+export default function Home() {
+  // --- Bid Estimator State ---
+  const [directLabor, setDirectLabor] = useState<number>(2500);
+  const [burdenPercent, setBurdenPercent] = useState<number>(28);
+  const [materials, setMaterials] = useState<number>(3200);
+  const [equipment, setEquipment] = useState<number>(600);
+  const [overheadPercent, setOverheadPercent] = useState<number>(15);
+  const [marginPercent, setMarginPercent] = useState<number>(20);
+
+  // --- Lien Calculation State ---
+  const [selectedState, setSelectedState] = useState<string>("SC");
+  const [firstWorkDate, setFirstWorkDate] = useState<string>("");
+  const [lastWorkDate, setLastWorkDate] = useState<string>("");
+
+  // Bid calculations
+  const burdenedLabor = directLabor * (1 + burdenPercent / 100);
+  const directCost = burdenedLabor + materials + equipment;
+  const overheadCost = directCost * (overheadPercent / 100);
+  const totalCost = directCost + overheadCost;
+  const targetPrice =
+    marginPercent < 100 ? totalCost / (1 - marginPercent / 100) : totalCost;
+  const projectedProfit = targetPrice - totalCost;
+
+  // Convert dictionary object to an array of rules safely
+  const rulesArray: StateLienRule[] = Object.values(statutoryRules);
+
+  // Lien rule calculations using correct interface properties ('code' instead of 'state')
+  const currentStateRule: StateLienRule =
+    rulesArray.find((r: StateLienRule) => r.code === selectedState) ||
+    rulesArray[0];
+
+  const calculateDeadlines = () => {
+    let prelimDate: Date | null = null;
+    let lienDate: Date | null = null;
+
+    if (firstWorkDate && currentStateRule?.preliminaryNoticeDays) {
+      const d = new Date(firstWorkDate);
+      d.setDate(d.getDate() + currentStateRule.preliminaryNoticeDays);
+      prelimDate = d;
+    }
+
+    if (lastWorkDate && currentStateRule?.lienFilingDays) {
+      const d = new Date(lastWorkDate);
+      d.setDate(d.getDate() + currentStateRule.lienFilingDays);
+      lienDate = d;
+    }
+
+    return { prelimDate, lienDate };
+  };
+
+  const { prelimDate, lienDate } = calculateDeadlines();
+
+  const handleDownloadCalendar = () => {
+    if (!prelimDate && !lienDate) {
+      alert("Please enter work dates first to calculate deadlines.");
+      return;
+    }
+
+    // Fixed: Passing the 3 expected arguments to generateIcsContent
+    const icsString = generateIcsContent(
+      `${currentStateRule.name} Project`,
+      prelimDate ? prelimDate.toISOString().split("T")[0] : null,
+      lienDate ? lienDate.toISOString().split("T")[0] : ""
+    );
+
+    const blob = new Blob([icsString], { type: "text/calendar;charset=utf-8" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `${currentStateRule.code}_SubShield_Deadlines.ics`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      {/* --- HEADER --- */}
+      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-xl tracking-tight text-white">
+              Sub<span className="text-amber-500">Shield</span>HQ
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+              Free Estimator
+            </span>
+          </div>
+
+          <nav className="flex items-center gap-6">
+            <a
+              href="#bid-calculator"
+              className="text-sm font-medium text-slate-300 hover:text-white transition"
+            >
+              Bid Calculator
+            </a>
+            <a
+              href="#deadline-calculator"
+              className="text-sm font-medium text-slate-300 hover:text-white transition"
+            >
+              Lien Deadlines
+            </a>
+            <a
+              href="#bid-toolkit"
+              className="text-sm font-semibold text-amber-500 hover:text-amber-400 transition"
+            >
+              Bid Toolkit
+            </a>
+            <a
+              href="#bid-calculator"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 transition"
+            >
+              Launch Tool
+            </a>
+          </nav>
+        </div>
+      </header>
+
+      {/* --- HERO SECTION --- */}
+      <section className="py-16 md:py-20 border-b border-slate-800/80 bg-gradient-to-b from-slate-900 to-slate-950">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wide uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+            Transparent Subcontractor Math
+          </span>
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-6">
+            Bid With Confidence. <br className="hidden sm:inline" />
+            Protect Your Margin & Cash Flow.
+          </h1>
+          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+            An open-access estimator for trade contractors. Factor in true labor
+            burden, recover actual overhead, protect target profit margins, and
+            check standard statutory notice timelines.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <a
+              href="#bid-calculator"
+              className="px-6 py-3 rounded-lg font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-lg shadow-amber-500/10"
+            >
+              Open Bid Estimator
+            </a>
+            <a
+              href="#deadline-calculator"
+              className="px-6 py-3 rounded-lg font-semibold bg-slate-800 hover:bg-slate-700 text-white transition border border-slate-700"
+            >
+              Check State Deadlines
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* --- MAIN TOOL CONTAINER --- */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full space-y-16">
+        {/* --- SECTION 1: BID ESTIMATOR --- */}
+        <section id="bid-calculator" className="scroll-mt-20">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <span className="text-amber-500">01.</span> Direct Cost & Margin
+              Calculator
+            </h2>
+            <p className="text-slate-400 text-sm">
+              All calculations run client-side in your browser. Your rates and
+              project values are never saved or sent to any server.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Input Column */}
+            <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Direct Wages ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={directLabor || ""}
+                    onChange={(e) => setDirectLabor(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="2500"
+                  />
+                  <span className="text-xs text-slate-500 mt-1 block">
+                    Base field hourly or trade labor
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Labor Burden Rate (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={burdenPercent || ""}
+                    onChange={(e) => setBurdenPercent(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="28"
+                  />
+                  <span className="text-xs text-slate-500 mt-1 block">
+                    FICA, FUTA, SUTA, workers' comp & benefits
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Direct Materials ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={materials || ""}
+                    onChange={(e) => setMaterials(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="3200"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Equipment / Rentals ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={equipment || ""}
+                    onChange={(e) => setEquipment(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Company Overhead Recovery (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={overheadPercent || ""}
+                    onChange={(e) => setOverheadPercent(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="15"
+                  />
+                  <span className="text-xs text-slate-500 mt-1 block">
+                    Shop, truck, insurance, software costs
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    Target Gross Margin (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={marginPercent || ""}
+                    onChange={(e) => setMarginPercent(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    placeholder="20"
+                  />
+                  <span className="text-xs text-slate-500 mt-1 block">
+                    Target gross profit share of final contract
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bid Summary Card */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">
+                  Bid Price Breakdown
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Burdened Labor:</span>
+                    <span className="font-mono text-white">
+                      ${burdenedLabor.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Direct Cost Total:</span>
+                    <span className="font-mono text-white">
+                      ${directCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Overhead Added:</span>
+                    <span className="font-mono text-white">
+                      ${overheadCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Break-Even Cost:</span>
+                    <span className="font-mono text-white font-medium">
+                      ${totalCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800 text-emerald-400">
+                    <span>Projected Net Profit:</span>
+                    <span className="font-mono font-medium">
+                      +${projectedProfit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-800">
+                <span className="text-xs uppercase text-slate-400 font-semibold tracking-wider block mb-1">
+                  Recommended Bid Price
+                </span>
+                <div className="text-3xl font-extrabold text-amber-400 font-mono">
+                  ${targetPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Formula: Break-Even Cost ÷ (1 - Margin%). Covers direct costs,
+                  recovers overhead, and delivers specified gross margin.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- SECTION 2: LIEN DEADLINE CALCULATOR --- */}
+        <section id="deadline-calculator" className="scroll-mt-20">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <span className="text-amber-500">02.</span> Mechanics Lien & Notice
+              Calendar Estimator
+            </h2>
+            <p className="text-slate-400 text-sm">
+              Look up standard statutory timeline windows by jurisdiction and
+              export calendar reminder alerts (.ics).
+            </p>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 lg:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                  Project Jurisdiction
+                </label>
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                >
+                  {rulesArray.map((rule: StateLienRule) => (
+                    <option key={rule.code} value={rule.code}>
+                      {rule.name} ({rule.code})
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs text-slate-500 mt-1 block">
+                  Select where project work is located
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                  First Day of Work / Material
+                </label>
+                <input
+                  type="date"
+                  value={firstWorkDate}
+                  onChange={(e) => setFirstWorkDate(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">
+                  Used for preliminary notice trigger
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                  Last Day of Work (or Est. Completion)
+                </label>
+                <input
+                  type="date"
+                  value={lastWorkDate}
+                  onChange={(e) => setLastWorkDate(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">
+                  Used for lien filing deadline trigger
+                </span>
+              </div>
+            </div>
+
+            {/* Timeline Results */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-lg bg-slate-950 border border-slate-800 mb-6">
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Preliminary Notice Window
+                </span>
+                <div className="text-xl font-bold text-white mt-1">
+                  {prelimDate ? prelimDate.toLocaleDateString() : "Enter First Work Date"}
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {currentStateRule?.notes || currentStateRule?.statutoryNoticeName || "Standard state rule window."}
+                </p>
+              </div>
+
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Lien Filing Deadline
+                </span>
+                <div className="text-xl font-bold text-white mt-1">
+                  {lienDate ? lienDate.toLocaleDateString() : "Enter Last Work Date"}
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {currentStateRule?.notes || currentStateRule?.statutoryNoticeName || "Standard state rule window."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800">
+              <p className="text-xs text-slate-400 max-w-xl">
+                <strong>Legal Disclaimer:</strong> Mechanics lien laws vary by
+                claimant tier, project type, and contract terms. These dates are
+                informational approximations and do not constitute formal legal
+                counsel. Always consult a qualified construction attorney to
+                protect your lien rights.
+              </p>
+              <button
+                onClick={handleDownloadCalendar}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-sm transition shrink-0"
+              >
+                Download Calendar Reminders (.ics)
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* --- SECTION 3: REVENUE / TOOLKIT OFFER --- */}
+        <section id="bid-toolkit" className="scroll-mt-20">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-8 lg:p-10 relative overflow-hidden">
+            <div className="max-w-3xl">
+              <span className="inline-block px-3 py-1 mb-3 text-xs font-semibold tracking-wide uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+                Subcontractor Offline Toolkit
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+                Want to run your estimating and job-costing in Excel or Google
+                Sheets?
+              </h2>
+              <p className="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed">
+                Take our proven bid math with you. The SubShield Contractor Bid
+                Pack includes a pre-configured Labor Burden Calculator, Overhead
+                Recovery Matrix, Proposal Scope & Exclusion Sheets, and a Change
+                Order Log.
+              </p>
+              <div className="flex flex-wrap items-center gap-4">
+                <a
+                  href="#contact"
+                  className="px-6 py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition"
+                >
+                  Join Pro Template Waitlist (Free Sample)
+                </a>
+                <span className="text-xs text-slate-400">
+                  No subscription required • One-time download
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* --- FOOTER --- */}
+      <footer className="border-t border-slate-800 bg-slate-950 py-10 mt-16 text-slate-400 text-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <span className="font-bold text-white text-base">
+              Sub<span className="text-amber-500">Shield</span>HQ
+            </span>
+            <p className="text-xs text-slate-500 mt-1">
+              Independent estimating & workflow utilities for specialty trade
+              subcontractors.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-6 text-xs text-slate-400">
+            <Link href="/about" className="hover:text-white transition">
+              About & Methodology
+            </Link>
+            <Link href="/privacy" className="hover:text-white transition">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-white transition">
+              Terms of Service
+            </Link>
+            <Link href="/contact" className="hover:text-white transition">
+              Contact & Corrections
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+--- END FILE: app/page.tsx ---
+
+--- START FILE: app/robots.ts ---
+import { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+    },
+    sitemap: 'https://subshieldhq.com/sitemap.xml',
+  };
+}
+--- END FILE: app/robots.ts ---
+
+--- START FILE: app/sitemap.ts ---
+import { MetadataRoute } from "next";
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = "https://www.subshieldhq.com";
+  const now = new Date();
+
+  return [
+    {
+      url: `${baseUrl}/`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    // --- Phase 2 SEO Cluster ---
+    {
+      url: `${baseUrl}/tools/labor-burden-calculator`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/guides/markup-vs-margin-construction`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/templates/subcontractor-bid-template`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // --- Trust & Compliance Pages ---
+    {
+      url: `${baseUrl}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+  ];
+}
+
+--- END FILE: app/sitemap.ts ---
+
+--- START FILE: app/about/page.tsx ---
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "About & Methodology",
+  description:
+    "Learn about SubShieldHQ's mission, calculation methodology, and construction estimating standards.",
+};
+
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
+            Sub<span className="text-amber-500">Shield</span>HQ
+          </Link>
+          <Link
+            href="/"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition border border-slate-700"
+          >
+            ← Back to Calculator
+          </Link>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-12 flex-1 w-full space-y-10">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-500">
+            About SubShieldHQ
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-1">
+            Independent Pricing Tools for Trade Contractors
+          </h1>
+        </div>
+
+        <section className="space-y-4 text-slate-300 leading-relaxed">
+          <p>
+            SubShieldHQ was created to solve a persistent problem faced by specialty subcontractors: 
+            <strong> underbidding jobs due to hidden labor burden and unrecovered overhead costs.</strong>
+          </p>
+          <p>
+            Many small trade contractors apply a flat markup (e.g., 20%) directly to raw wages and materials, 
+            without accounting for employer payroll taxes, workers' compensation insurance, non-billable shop time, 
+            or operating overhead. The result is often high job-site volume with near-zero net profit.
+          </p>
+        </section>
+
+        <section className="border-t border-slate-800 pt-8 space-y-4 text-slate-300 leading-relaxed">
+          <h2 className="text-xl font-bold text-white">Our Calculation Methodology</h2>
+          
+          <h3 className="text-base font-semibold text-amber-400 pt-2">1. Fully Burdened Labor</h3>
+          <p>
+            Raw hourly wages do not reflect the true cost of an employee on site. Our estimator applies a labor burden 
+            multiplier that accounts for employer FICA (Social Security & Medicare), FUTA, SUTA, workers’ compensation 
+            premiums by trade class code, paid leave, and safety allowances.
+          </p>
+
+          <h3 className="text-base font-semibold text-amber-400 pt-2">2. Break-Even Overhead Recovery</h3>
+          <p>
+            Every trade business incurs fixed indirect expenses (shop rent, estimating software, legal, insurance, truck payments). 
+            Our model allocates an overhead recovery percentage across direct project costs so that baseline business expenses 
+            are recovered before profit is calculated.
+          </p>
+
+          <h3 className="text-base font-semibold text-amber-400 pt-2">3. Markup vs. Gross Margin</h3>
+          <p>
+            Adding a 20% markup on costs is <em>not</em> the same as earning a 20% gross margin. We calculate target pricing using 
+            the true gross margin formula:
+          </p>
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-lg font-mono text-sm text-amber-300">
+            Bid Price = Total Break-Even Cost ÷ (1 - Target Gross Margin %)
+          </div>
+        </section>
+
+        <section className="border-t border-slate-800 pt-8 space-y-4 text-slate-300 leading-relaxed">
+          <h2 className="text-xl font-bold text-white">Statutory Deadlines & Legal Notice Policy</h2>
+          <p>
+            Our lien deadline reference tool translates standard state statutory rules into estimated project reminder dates. 
+            Because statutory deadlines depend on specific claimant classifications (prime contractor, 1st-tier sub, supplier), 
+            contract language, and specific county filing rules, these dates are provided strictly as general reference baselines 
+            and do not constitute formal legal counsel.
+          </p>
+        </section>
+      </main>
+
+      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        © {new Date().getFullYear()} SubShieldHQ. For informational estimating purposes only.
+      </footer>
+    </div>
+  );
+}
+
+--- END FILE: app/about/page.tsx ---
+
+--- START FILE: app/api/leads/route.ts ---
+import { NextResponse } from "next/server";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function POST(req: Request) {
+  try {
+    const { email } = await req.json();
+
+    if (!email || !email.includes("@")) {
+      return NextResponse.json(
+        { error: "Valid email required" },
+        { status: 400 }
+      );
+    }
+
+    // Sends the alert to you
+    await resend.emails.send({
+      from: "SubShield Leads <onboarding@resend.dev>",
+      to: process.env.MY_EMAIL || "waylonaho@gmail.com",
+      subject: "🚨 New Contractor Lead!",
+      text: `A contractor requested your template:\n\nEmail: ${email}`,
+    });
+
+    // Sends the template to the contractor
+    await resend.emails.send({
+      from: "SubShieldHQ <onboarding@resend.dev>",
+      to: email,
+      subject: "Your Free Contractor Bid Estimator Template",
+      html: `
+        <div style="font-family: sans-serif; max-width: 500px; padding: 20px;">
+          <h2>Your SubShield Bid Template</h2>
+          <p>Thanks for requesting the contractor bid template.</p>
+          <p>Click below to copy the spreadsheet to your Google Drive or download it:</p>
+          <p>
+            <a href="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/copy" 
+               style="background:#f59e0b; color:#000; padding:12px 20px; font-weight:bold; text-decoration:none; border-radius:6px; display:inline-block;">
+              Open Template in Google Sheets
+            </a>
+          </p>
+        </div>
+      `,
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to send" }, { status: 500 });
+  }
+}
+
+--- END FILE: app/api/leads/route.ts ---
+
+--- START FILE: app/contact/page.tsx ---
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description: "Get in touch with SubShieldHQ for support, tool feedback, or statutory rule updates.",
+};
+
+export default function ContactPage() {
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
+            Sub<span className="text-amber-500">Shield</span>HQ
+          </Link>
+          <Link
+            href="/"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition border border-slate-700"
+          >
+            ← Back to Calculator
+          </Link>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-12 flex-1 w-full space-y-8 text-slate-300 leading-relaxed text-sm">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-500">
+            Get In Touch
+          </span>
+          <h1 className="text-3xl font-extrabold text-white mt-1">Contact & Rule Feedback</h1>
+          <p className="text-slate-400 mt-2">
+            Have a suggestion for our bid calculator or noticed a recent change in your state's mechanics lien statutory timeline? We welcome your feedback.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h2 className="text-base font-bold text-white mb-2">Direct Support & Feedback</h2>
+            <p className="text-slate-400 text-sm mb-4">
+              For general inquiries, partnership questions, or spreadsheet download assistance:
+            </p>
+            <a
+              href="mailto:support@subshieldhq.com"
+              className="text-amber-400 font-semibold hover:underline"
+            >
+              support@subshieldhq.com
+            </a>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h2 className="text-base font-bold text-white mb-2">Submit Statutory Corrections</h2>
+            <p className="text-slate-400 text-sm mb-4">
+              If a state statute code, preliminary notice window, or lien filing timeframe has changed, please send us the citation so we can update our reference records:
+            </p>
+            <a
+              href="mailto:corrections@subshieldhq.com"
+              className="text-amber-400 font-semibold hover:underline"
+            >
+              corrections@subshieldhq.com
+            </a>
+          </div>
+        </div>
+
+        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 mt-6">
+          <h3 className="text-sm font-semibold text-white mb-1">Developer & Open Project Repository</h3>
+          <p className="text-xs text-slate-400">
+            SubShieldHQ’s public calculation tables and client-side logic are versioned transparently. You can report technical issues or review the codebase on GitHub.
+          </p>
+        </div>
+      </main>
+
+      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        © {new Date().getFullYear()} SubShieldHQ.
+      </footer>
+    </div>
+  );
+}
+
+--- END FILE: app/contact/page.tsx ---
+
+--- START FILE: app/guides/markup-vs-margin-construction/page.tsx ---
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+export default function MarkupVsMarginGuide() {
+  const [jobCost, setJobCost] = useState<number>(10000);
+  const [markupPercent, setMarkupPercent] = useState<number>(20);
+
+  // Math
+  const markupPrice = jobCost * (1 + markupPercent / 100);
+  const markupProfit = markupPrice - jobCost;
+  const actualGrossMargin = (markupProfit / markupPrice) * 100;
+
+  // Margin target price comparison
+  const marginPrice = jobCost / (1 - markupPercent / 100);
+  const marginProfit = marginPrice - jobCost;
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
+            Sub<span className="text-amber-500">Shield</span>HQ
+          </Link>
+          <Link
+            href="/tools/labor-burden-calculator"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition border border-slate-700"
+          >
+            ← Labor Burden Tool
+          </Link>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-12 flex-1 w-full space-y-10">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-500">
+            Contractor Financial Guide
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-1">
+            Construction Markup vs. Margin: The Math That Costs Subs Money
+          </h1>
+          <p className="text-slate-400 mt-2 text-sm sm:text-base">
+            Why adding a 20% markup does not give you a 20% margin—and how pricing errors compound over a commercial project.
+          </p>
+        </div>
+
+        {/* Interactive Comparison Widget */}
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 sm:p-8 space-y-6">
+          <h2 className="text-base font-bold text-white uppercase tracking-wider text-amber-500">
+            Interactive Test: Enter Your Job Cost
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                Total Job Cost ($)
+              </label>
+              <input
+                type="number"
+                value={jobCost || ""}
+                onChange={(e) => setJobCost(Number(e.target.value))}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-amber-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                Entered Percentage (%)
+              </label>
+              <input
+                type="number"
+                value={markupPercent || ""}
+                onChange={(e) => setMarkupPercent(Number(e.target.value))}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-amber-500"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-800">
+            <div className="bg-slate-950 p-5 rounded-lg border border-slate-800">
+              <span className="text-xs uppercase text-slate-400 font-semibold block">
+                Scenario A: Adding a {markupPercent}% Markup
+              </span>
+              <div className="text-2xl font-bold text-white mt-2 font-mono">
+                ${markupPrice.toLocaleString()}
+              </div>
+              <div className="text-xs text-amber-400 mt-2">
+                Actual Gross Margin: <strong>{actualGrossMargin.toFixed(1)}%</strong>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Profit: ${markupProfit.toLocaleString()}
+              </p>
+            </div>
+
+            <div className="bg-slate-950 p-5 rounded-lg border border-amber-500/30">
+              <span className="text-xs uppercase text-amber-400 font-semibold block">
+                Scenario B: Targeting a True {markupPercent}% Gross Margin
+              </span>
+              <div className="text-2xl font-bold text-amber-400 mt-2 font-mono">
+                ${Math.round(marginPrice).toLocaleString()}
+              </div>
+              <div className="text-xs text-emerald-400 mt-2">
+                Actual Gross Margin: <strong>{markupPercent.toFixed(1)}%</strong>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Profit: ${Math.round(marginProfit).toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-400 italic">
+            In this example, confusing markup with margin leaves 
+            <strong className="text-amber-400"> ${(marginPrice - markupPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong> of unrecovered revenue on the table.
+          </p>
+        </div>
+
+        {/* Text Breakdown */}
+        <section className="space-y-4 text-slate-300 leading-relaxed">
+          <h2 className="text-xl font-bold text-white">The Difference Between the Formulas</h2>
+          <p>
+            <strong>Markup</strong> is the percentage added directly to your cost to arrive at a selling price:
+          </p>
+          <div className="bg-slate-900 border border-slate-800 p-3 rounded font-mono text-xs text-amber-300">
+            Markup Price = Direct Cost × (1 + Markup %)
+          </div>
+
+          <p>
+            <strong>Gross Margin</strong> is the percentage of the <em>final contract price</em> that is retained as profit after direct expenses:
+          </p>
+          <div className="bg-slate-900 border border-slate-800 p-3 rounded font-mono text-xs text-amber-300">
+            Margin Price = Direct Cost ÷ (1 - Margin %)
+          </div>
+        </section>
+
+        <section className="border-t border-slate-800 pt-8 text-center space-y-4">
+          <h3 className="text-lg font-bold text-white">Need a spreadsheet that handles the math automatically?</h3>
+          <Link
+            href="/templates/subcontractor-bid-template"
+            className="inline-block px-6 py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition"
+          >
+            Download Free Contractor Bid Template
+          </Link>
+        </section>
+      </main>
+
+      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        © {new Date().getFullYear()} SubShieldHQ.
+      </footer>
+    </div>
+  );
+}
+
+--- END FILE: app/guides/markup-vs-margin-construction/page.tsx ---
+
+--- START FILE: app/privacy/page.tsx ---
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "SubShieldHQ privacy policy: we respect contractor privacy and run all calculations client-side.",
+};
+
+export default function PrivacyPage() {
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
+            Sub<span className="text-amber-500">Shield</span>HQ
+          </Link>
+          <Link
+            href="/"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition border border-slate-700"
+          >
+            ← Back to Calculator
+          </Link>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-12 flex-1 w-full space-y-8 text-slate-300 leading-relaxed text-sm">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-500">
+            Privacy & Data Security
+          </span>
+          <h1 className="text-3xl font-extrabold text-white mt-1">Privacy Policy</h1>
+          <p className="text-xs text-slate-500 mt-1">Last Updated: November 2026</p>
+        </div>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">1. Client-Side Processing (Your Rates Stay Private)</h2>
+          <p>
+            We recognize that your hourly wage rates, trade margins, and bid calculations are sensitive, proprietary business assets. 
+            All numbers entered into the SubShieldHQ calculators (direct labor, materials, equipment, overhead, and margin percentages) 
+            are processed entirely in your web browser. <strong>We do not log, transmit, or store your calculator inputs on any server or database.</strong>
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">2. Information We May Collect</h2>
+          <p>
+            When you interact with our website, we may collect minimal standard data, including:
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-slate-400">
+            <li><strong>Voluntary Email Submissions:</strong> If you opt in to receive downloadable spreadsheet templates or product updates.</li>
+            <li><strong>Aggregated Web Analytics:</strong> Privacy-conscious page visit metrics (e.g., pages viewed, referring sites) without logging personal identifying information.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">3. Third-Party Services & Links</h2>
+          <p>
+            SubShieldHQ may contain links to external sites (such as construction software providers, trade associations, or statutory references). 
+            We do not control the privacy practices of external websites. If you click on an affiliate or external link, review that third party’s privacy policy.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">4. Contacting Us</h2>
+          <p>
+            For any privacy-related questions or data deletion requests, please contact us at{" "}
+            <a href="mailto:support@subshieldhq.com" className="text-amber-400 underline">
+              support@subshieldhq.com
+            </a>.
+          </p>
+        </section>
+      </main>
+
+      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        © {new Date().getFullYear()} SubShieldHQ.
+      </footer>
+    </div>
+  );
+}
+
+--- END FILE: app/privacy/page.tsx ---
+
+--- START FILE: app/templates/subcontractor-bid-template/page.tsx ---
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+export default function BidTemplatePage() {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        setErrorMsg("Something went wrong. Please check your email and try again.");
+      }
+    } catch (err) {
+      setErrorMsg("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
+            Sub<span className="text-amber-500">Shield</span>HQ
+          </Link>
+          <Link
+            href="/"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition border border-slate-700"
+          >
+            ← Back to Calculator
+          </Link>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12 flex-1 w-full space-y-8">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-500">
+            Downloadable Toolkits
+          </span>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white mt-1">
+            Subcontractor Bid Estimating Template
+          </h1>
+          <p className="text-slate-400 mt-2 text-sm">
+            A free, clean spreadsheet for Excel & Google Sheets with built-in labor burden and overhead recovery formulas.
+          </p>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 sm:p-8 max-w-lg mx-auto">
+          <span className="text-xs font-bold uppercase tracking-wider text-amber-500">
+            Free Instant Access
+          </span>
+          <h2 className="text-xl font-bold text-white mt-1">
+            Download the Starter Template
+          </h2>
+          <p className="text-xs text-slate-400 mt-1 mb-6">
+            Enter your email to receive an instant copy link.
+          </p>
+
+          {submitted ? (
+            <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm text-center">
+              🎉 Check your inbox! Your template download link has been sent.
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                  Your Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="name@yourcompany.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              {errorMsg && (
+                <p className="text-red-400 text-xs">{errorMsg}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm uppercase tracking-wider transition disabled:opacity-50"
+              >
+                {loading ? "Sending Link..." : "Send Free Template"}
+              </button>
+            </form>
+          )}
+        </div>
+      </main>
+
+      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        © {new Date().getFullYear()} SubShieldHQ.
+      </footer>
+    </div>
+  );
+}
+
+--- END FILE: app/templates/subcontractor-bid-template/page.tsx ---
+
+--- START FILE: app/terms/page.tsx ---
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "SubShieldHQ terms of service, estimation disclaimers, and legal notices.",
+};
+
+export default function TermsPage() {
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
+            Sub<span className="text-amber-500">Shield</span>HQ
+          </Link>
+          <Link
+            href="/"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition border border-slate-700"
+          >
+            ← Back to Calculator
+          </Link>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-12 flex-1 w-full space-y-8 text-slate-300 leading-relaxed text-sm">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-500">
+            Terms of Use
+          </span>
+          <h1 className="text-3xl font-extrabold text-white mt-1">Terms of Service</h1>
+          <p className="text-xs text-slate-500 mt-1">Last Updated: November 2026</p>
+        </div>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">1. Not Certified Accounting or Legal Counsel</h2>
+          <p>
+            SubShieldHQ provides operational tools, spreadsheets, and reference formulas for informational estimating purposes only. 
+            Use of our tools does not establish an attorney-client or certified accounting relationship. You are solely responsible for 
+            verifying your project bids, contracts, tax obligations, and statutory lien notices with qualified professionals in your state.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">2. Accuracy of Estimating Formulas</h2>
+          <p>
+            While our tools use standard cost-plus construction pricing principles, output prices are entirely dependent on user-entered values. 
+            SubShieldHQ is not liable for project underbids, job cost overruns, bid rejections, or business losses resulting from the use of our calculators.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">3. Statutory Deadline Reminders</h2>
+          <p>
+            Statutory notice and mechanics lien deadlines vary widely across jurisdictions and are subject to judicial interpretations, 
+            contractual waivers, and legislative amendments. The calendar export (.ics) is a personal reminder tool and does not guarantee legal compliance.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">4. Limitation of Liability</h2>
+          <p>
+            To the maximum extent permitted by applicable law, SubShieldHQ and its creators shall not be liable for any indirect, incidental, 
+            or consequential damages arising out of your access to or use of the website and downloadable materials.
+          </p>
+        </section>
+      </main>
+
+      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        © {new Date().getFullYear()} SubShieldHQ.
+      </footer>
+    </div>
+  );
+}
+
+--- END FILE: app/terms/page.tsx ---
+
+--- START FILE: app/tools/labor-burden-calculator/page.tsx ---
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+export default function LaborBurdenCalculator() {
+  // Base Wage & Hours
+  const [hourlyWage, setHourlyWage] = useState<number>(32);
+  const [annualHours, setAnnualHours] = useState<number>(2080); // 40 hrs * 52 wks
+
+  // Statutory Payroll Taxes (%)
+  const [ficaRate, setFicaRate] = useState<number>(7.65); // Social Security (6.2%) + Medicare (1.45%)
+  const [futaRate, setFutaRate] = useState<number>(0.6); // Federal Unemployment on first $7,000
+  const [sutaRate, setSutaRate] = useState<number>(3.5); // State Unemployment (varies)
+
+  // Insurance & Benefits
+  const [workersCompRate, setWorkersCompRate] = useState<number>(8.5); // % of payroll based on class code
+  const [annualPaidLeaveHours, setAnnualPaidLeaveHours] = useState<number>(80); // 10 days PTO/holidays
+  const [annualBenefitsCost, setAnnualBenefitsCost] = useState<number>(3600); // Health, safety gear, 401k
+
+  // Calculations
+  const grossAnnualBasePay = hourlyWage * annualHours;
+
+  const annualFica = grossAnnualBasePay * (ficaRate / 100);
+  // FUTA is capped at $7,000 max wage per employee in the US ($42 max), simplified:
+  const annualFuta = Math.min(grossAnnualBasePay, 7000) * (futaRate / 100);
+  const annualSuta = grossAnnualBasePay * (sutaRate / 100);
+  const annualWorkersComp = grossAnnualBasePay * (workersCompRate / 100);
+
+  const annualPaidLeaveCost = hourlyWage * annualPaidLeaveHours;
+  const totalIndirectLaborCost =
+    annualFica +
+    annualFuta +
+    annualSuta +
+    annualWorkersComp +
+    annualPaidLeaveCost +
+    annualBenefitsCost;
+
+  const totalTrueLaborCost = grossAnnualBasePay + totalIndirectLaborCost;
+  const laborBurdenPercentage = (totalIndirectLaborCost / grossAnnualBasePay) * 100;
+  const trueCostPerHour = totalTrueLaborCost / (annualHours - annualPaidLeaveHours); // True cost per actual working hour
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      {/* Top Bar */}
+      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
+            Sub<span className="text-amber-500">Shield</span>HQ
+          </Link>
+          <div className="flex items-center gap-4 text-xs">
+            <Link
+              href="/guides/markup-vs-margin-construction"
+              className="text-slate-300 hover:text-white transition hidden sm:inline"
+            >
+              Markup vs Margin Guide
+            </Link>
+            <Link
+              href="/templates/subcontractor-bid-template"
+              className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold transition"
+            >
+              Download Bid Sheet
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Container */}
+      <main className="max-w-6xl mx-auto px-4 py-12 flex-1 w-full space-y-12">
+        {/* Title & Introduction */}
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-500">
+            Trade Contractor Cost Tool
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-1">
+            Contractor Labor Burden Calculator
+          </h1>
+          <p className="text-slate-400 text-sm sm:text-base mt-2 max-w-3xl">
+            An employee who earns $32/hour actually costs your business significantly more. 
+            Use this calculator to audit payroll taxes, workers' compensation rates, and benefits 
+            to discover your true cost per productive billable hour.
+          </p>
+        </div>
+
+        {/* The Interactive Tool Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Inputs Column (2 cols wide) */}
+          <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 sm:p-8 space-y-6">
+            <h2 className="text-lg font-bold text-white border-b border-slate-800 pb-3">
+              1. Base Wage & Hours
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                  Hourly Base Wage ($/hr)
+                </label>
+                <input
+                  type="number"
+                  value={hourlyWage || ""}
+                  onChange={(e) => setHourlyWage(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                  Annual Working Hours
+                </label>
+                <input
+                  type="number"
+                  value={annualHours || ""}
+                  onChange={(e) => setAnnualHours(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">Default: 2,080 (40 hrs × 52 weeks)</span>
+              </div>
+            </div>
+
+            <h2 className="text-lg font-bold text-white border-b border-slate-800 pb-3 pt-2">
+              2. Mandatory Employer Payroll Taxes & Insurance
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                  FICA (Social Security & Medicare) %
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={ficaRate || ""}
+                  onChange={(e) => setFicaRate(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">Federal rate is 7.65%</span>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                  State Unemployment (SUTA) %
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={sutaRate || ""}
+                  onChange={(e) => setSutaRate(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">Varies by state & rating</span>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                  Workers' Comp (% of Payroll)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={workersCompRate || ""}
+                  onChange={(e) => setWorkersCompRate(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">Class code specific</span>
+              </div>
+            </div>
+
+            <h2 className="text-lg font-bold text-white border-b border-slate-800 pb-3 pt-2">
+              3. Benefits & Non-Productive Time
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                  Annual Paid Time Off / Holidays (Hours)
+                </label>
+                <input
+                  type="number"
+                  value={annualPaidLeaveHours || ""}
+                  onChange={(e) => setAnnualPaidLeaveHours(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">80 hrs = 10 standard days</span>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
+                  Annual Health/Retirement/Tools ($)
+                </label>
+                <input
+                  type="number"
+                  value={annualBenefitsCost || ""}
+                  onChange={(e) => setAnnualBenefitsCost(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+                <span className="text-xs text-slate-500 mt-1 block">Total perks & safety allowance</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Results Card */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between h-fit lg:sticky lg:top-24">
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-500 mb-4">
+                Burden Analysis Summary
+              </h3>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between py-1 border-b border-slate-800">
+                  <span className="text-slate-400">Gross Base Wage:</span>
+                  <span className="font-mono text-white">${grossAnnualBasePay.toLocaleString()} /yr</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-800">
+                  <span className="text-slate-400">FICA (Employer):</span>
+                  <span className="font-mono text-white">${Math.round(annualFica).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-800">
+                  <span className="text-slate-400">SUTA & FUTA:</span>
+                  <span className="font-mono text-white">${Math.round(annualSuta + annualFuta).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-800">
+                  <span className="text-slate-400">Workers' Comp:</span>
+                  <span className="font-mono text-white">${Math.round(annualWorkersComp).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-800">
+                  <span className="text-slate-400">Paid Leave & Perks:</span>
+                  <span className="font-mono text-white">
+                    ${Math.round(annualPaidLeaveCost + annualBenefitsCost).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-800">
+                <span className="text-xs uppercase text-slate-400 font-semibold tracking-wider block">
+                  Calculated Labor Burden Rate
+                </span>
+                <div className="text-3xl font-extrabold text-amber-400 font-mono mt-1">
+                  +{laborBurdenPercentage.toFixed(1)}%
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  On top of base hourly wages.
+                </p>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-800 bg-slate-950/60 p-4 rounded-lg">
+                <span className="text-xs uppercase text-slate-400 font-semibold tracking-wider block">
+                  True Cost Per Billable Hour
+                </span>
+                <div className="text-2xl font-bold text-white font-mono mt-1">
+                  ${trueCostPerHour.toFixed(2)} <span className="text-xs font-normal text-slate-400">/hr</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Accounts for non-billable paid time off.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Link
+                href="/templates/subcontractor-bid-template"
+                className="w-full block text-center py-2.5 px-4 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition"
+              >
+                Get Excel Estimator Sheet
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Educational Content Section (Crucial for SEO & Informational Intent) */}
+        <div className="border-t border-slate-800 pt-12 space-y-8 text-slate-300 leading-relaxed">
+          <div className="max-w-3xl">
+            <h2 className="text-2xl font-bold text-white mb-4">
+              What is Labor Burden and Why Does It Break Trade Bids?
+            </h2>
+            <p className="mb-4">
+              Labor burden is the actual cost of having an employee on your payroll beyond their raw hourly rate. 
+              When a plumbing, electrical, framing, or HVAC subcontractor calculates a project estimate using 
+              only base wages (e.g. $30/hr), they are absorbing 25% to 40% of hidden payroll costs straight out of their profit margin.
+            </p>
+            <p>
+              The primary elements that comprise a contractor's labor burden include:
+            </p>
+            <ul className="list-disc list-inside space-y-2 mt-3 text-slate-300">
+              <li><strong>Employer FICA:</strong> 6.2% Social Security + 1.45% Medicare.</li>
+              <li><strong>FUTA & SUTA:</strong> Federal and State unemployment insurance taxes.</li>
+              <li><strong>Workers’ Compensation:</strong> Heavily elevated in construction trades depending on risk classifications (roofing and steel erection carry much higher rates than painting or trim carpentry).</li>
+              <li><strong>Non-Productive Paid Hours:</strong> Holidays, sick days, weather cancellations, and training time that generate zero billable job revenue.</li>
+            </ul>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        © {new Date().getFullYear()} SubShieldHQ. For operational estimating purposes only.
+      </footer>
+    </div>
+  );
+}
+
+--- END FILE: app/tools/labor-burden-calculator/page.tsx ---
+
+--- START FILE: lib/generateIcs.ts ---
+export function generateIcsFile(
+  projectName: string,
+  preliminaryDeadline: string | null,
+  lienDeadline: string
+): string {
+  const formatDate = (dateStr: string) => dateStr.replace(/-/g, '');
+
+  let events = '';
+
+  if (preliminaryDeadline) {
+    const pDate = formatDate(preliminaryDeadline);
+    events += `
+BEGIN:VEVENT
+UID:prelim-${Date.now()}@subshield.com
+DTSTAMP:${formatDate(new Date().toISOString().slice(0, 10))}T090000Z
+DTSTART;VALUE=DATE:${pDate}
+SUMMARY:CRITICAL: Preliminary Notice Deadline - ${projectName}
+DESCRIPTION:Statutory cutoff window to deliver preliminary notice or notice to owner. Missing this deadline forfeits mechanic's lien rights.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Preliminary Notice Deadline in 5 Days!
+TRIGGER:-P5D
+END:VALARM
+END:VEVENT`;
+  }
+
+  const lDate = formatDate(lienDeadline);
+  events += `
+BEGIN:VEVENT
+UID:lien-${Date.now()}@subshield.com
+DTSTAMP:${formatDate(new Date().toISOString().slice(0, 10))}T090000Z
+DTSTART;VALUE=DATE:${lDate}
+SUMMARY:FINAL CUTOFF: Mechanics Lien Filing Deadline - ${projectName}
+DESCRIPTION:Last statutory date to record a formal mechanic's lien against the real property parcel.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Lien Filing Cutoff in 14 Days!
+TRIGGER:-P14D
+END:VALARM
+END:VEVENT`;
+
+  return `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//SubShield HQ//Lien Safe Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH${events}
+END:VCALENDAR`.trim();
+}
+--- END FILE: lib/generateIcs.ts ---
+
+--- START FILE: lib/statutoryRules.ts ---
+export interface StateLienRule {
+  name: string;
+  code: string;
+  preliminaryNoticeDays: number | null; // null if not strictly mandated
+  noticeTrigger: 'first_furnishing' | 'last_furnishing' | 'invoice_date' | 'none';
+  lienFilingDays: number;
+  lienTrigger: 'last_furnishing' | 'completion';
+  statutoryNoticeName: string;
+  notes: string;
+}
+
+export const STATE_LIEN_RULES: Record<string, StateLienRule> = {
+  AL: {
+    name: 'Alabama',
+    code: 'AL',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 120, // 4 months for subcontractors
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Intent to Claim Lien (§ 35-11-218)',
+    notes: 'Subcontractors must deliver formal written notice to owner prior to filing.'
+  },
+  AK: {
+    name: 'Alaska',
+    code: 'AK',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Right to Lien (AS 34.35.064)',
+    notes: 'Optional but preserves priority against Notice of Completion recordings.'
+  },
+  AZ: {
+    name: 'Arizona',
+    code: 'AZ',
+    preliminaryNoticeDays: 20,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 120,
+    lienTrigger: 'completion',
+    statutoryNoticeName: '20-Day Preliminary Notice (A.R.S. § 33-992.01)',
+    notes: 'Mandatory within 20 days of first furnishing to preserve complete lien rights.'
+  },
+  AR: {
+    name: 'Arkansas',
+    code: 'AR',
+    preliminaryNoticeDays: 75,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Commercial Pre-Lien Notice (Ark. Code § 18-44-115)',
+    notes: 'Subcontractors must serve notice to owner prior to or within 75 days.'
+  },
+  CA: {
+    name: 'California',
+    code: 'CA',
+    preliminaryNoticeDays: 20,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: '20-Day Preliminary Notice (Civil Code § 8200)',
+    notes: 'Notice must be served within 20 days of first furnishing labor or materials.'
+  },
+  CO: {
+    name: 'Colorado',
+    code: 'CO',
+    preliminaryNoticeDays: 10,
+    noticeTrigger: 'invoice_date',
+    lienFilingDays: 120, // 4 months
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Intent to File Lien (C.R.S. § 38-22-109)',
+    notes: 'Must serve Notice of Intent at least 10 days before recording lien.'
+  },
+  CT: {
+    name: 'Connecticut',
+    code: 'CT',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Intent to Claim Lien (Conn. Gen. Stat. § 49-34)',
+    notes: 'Must be served on property owner within 90 days after ceasing labor.'
+  },
+  DE: {
+    name: 'Delaware',
+    code: 'DE',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Statement of Claim for Mechanics Lien (25 Del. C. § 2711)',
+    notes: 'Subcontractors must file Statement of Claim within 120 days of completion.'
+  },
+  DC: {
+    name: 'District of Columbia',
+    code: 'DC',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'completion',
+    statutoryNoticeName: 'Notice of Mechanics Lien (D.C. Code § 40-301.02)',
+    notes: 'Must file and serve on owner within 90 days of project completion.'
+  },
+  FL: {
+    name: 'Florida',
+    code: 'FL',
+    preliminaryNoticeDays: 45,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice to Owner (NTO) (Fla. Stat. § 713.06)',
+    notes: 'Must be served within 45 days of first work or prior to final payment.'
+  },
+  GA: {
+    name: 'Georgia',
+    code: 'GA',
+    preliminaryNoticeDays: 30,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice to Contractor (O.C.G.A. § 44-14-361.5)',
+    notes: 'Required within 30 days if a Notice of Commencement is filed by owner/GC.'
+  },
+  HI: {
+    name: 'Hawaii',
+    code: 'HI',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 45,
+    lienTrigger: 'completion',
+    statutoryNoticeName: 'Application for Lien (HRS § 507-43)',
+    notes: 'Hawaii requires a court hearing before a mechanics lien can formally attach.'
+  },
+  ID: {
+    name: 'Idaho',
+    code: 'ID',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Claim of Lien (Idaho Code § 45-507)',
+    notes: 'Must be filed within 90 days of last work and served within 24 hours.'
+  },
+  IL: {
+    name: 'Illinois',
+    code: 'IL',
+    preliminaryNoticeDays: 90,
+    noticeTrigger: 'last_furnishing',
+    lienFilingDays: 120, // 4 months
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: '90-Day Subcontractor Notice (770 ILCS 60/24)',
+    notes: 'Notice of claim must be served on owner and lender within 90 days of completion.'
+  },
+  IN: {
+    name: 'Indiana',
+    code: 'IN',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Sworn Statement of Intent (IC 32-28-3-3)',
+    notes: 'Commercial liens allow 90 days; residential is shortened to 60 days.'
+  },
+  IA: {
+    name: 'Iowa',
+    code: 'IA',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'MNLR Posting / Mechanics Notice (Iowa Code Ch. 572)',
+    notes: 'Filings must be posted directly to Iowa’s Mechanics’ Notice and Lien Registry (MNLR).'
+  },
+  KS: {
+    name: 'Kansas',
+    code: 'KS',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90, // 3 months for subcontractors
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Mechanic’s Lien Statement (K.S.A. § 60-1103)',
+    notes: 'Subcontractors must file within 3 months unless an extension is granted.'
+  },
+  KY: {
+    name: 'Kentucky',
+    code: 'KY',
+    preliminaryNoticeDays: 75,
+    noticeTrigger: 'last_furnishing',
+    lienFilingDays: 180, // 6 months
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Preliminary Notice of Intent (KRS § 376.010)',
+    notes: 'Notice must be served on owner within 75 days of last furnishing for sub claims.'
+  },
+  LA: {
+    name: 'Louisiana',
+    code: 'LA',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 60,
+    lienTrigger: 'completion',
+    statutoryNoticeName: 'Statement of Claim or Privilege (La. R.S. 9:4822)',
+    notes: 'Rules depend on Notice of Contract; filing timeline typically 30–60 days.'
+  },
+  ME: {
+    name: 'Maine',
+    code: 'ME',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Lien Claim (10 M.R.S. § 3253)',
+    notes: 'Must be preserved by filing certificate within 90 days of last work.'
+  },
+  MD: {
+    name: 'Maryland',
+    code: 'MD',
+    preliminaryNoticeDays: 120,
+    noticeTrigger: 'last_furnishing',
+    lienFilingDays: 180,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Intent to Claim a Lien (Md. Real Prop. § 9-104)',
+    notes: 'Must give written notice to owner within 120 days of last furnishing.'
+  },
+  MA: {
+    name: 'Massachusetts',
+    code: 'MA',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Identification / Subcontract (M.G.L. c. 254 § 4)',
+    notes: 'Subcontractors should record Notice of Subcontract early to protect equity.'
+  },
+  MI: {
+    name: 'Michigan',
+    code: 'MI',
+    preliminaryNoticeDays: 20,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Furnishing (MCL 570.1109)',
+    notes: 'Subcontractors must serve notice within 20 days of first furnishing.'
+  },
+  MN: {
+    name: 'Minnesota',
+    code: 'MN',
+    preliminaryNoticeDays: 45,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Pre-Lien Notice (Minn. Stat. § 514.011)',
+    notes: 'Notice must be delivered personally or by certified mail within 45 days.'
+  },
+  MS: {
+    name: 'Mississippi',
+    code: 'MS',
+    preliminaryNoticeDays: 30,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Pre-Lien Notice to Owner (Miss. Code § 85-7-405)',
+    notes: 'Subcontractors must provide notice to owner if GC has not filed Commencement.'
+  },
+  MO: {
+    name: 'Missouri',
+    code: 'MO',
+    preliminaryNoticeDays: 10,
+    noticeTrigger: 'invoice_date',
+    lienFilingDays: 180, // 6 months
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Intent to File Lien (Mo. Rev. Stat. § 429.100)',
+    notes: 'Subcontractors must provide 10 days notice to owner prior to filing.'
+  },
+  MT: {
+    name: 'Montana',
+    code: 'MT',
+    preliminaryNoticeDays: 20,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Right to Claim Lien (MCA 71-3-531)',
+    notes: 'Must be filed/served within 20 days of first furnishing labor or materials.'
+  },
+  NE: {
+    name: 'Nebraska',
+    code: 'NE',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Commencement of Lien (Neb. Rev. Stat. § 52-137)',
+    notes: 'Lien statement must be recorded within 120 days after last furnishing.'
+  },
+  NV: {
+    name: 'Nevada',
+    code: 'NV',
+    preliminaryNoticeDays: 31,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Right to Lien (NRS 108.245)',
+    notes: 'Must be delivered to owner and prime within 31 days of first work.'
+  },
+  NH: {
+    name: 'New Hampshire',
+    code: 'NH',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Intent to Claim Lien (RSA 447:5)',
+    notes: 'Subcontractors must notify owner in writing to capture unpaid retainage.'
+  },
+  NJ: {
+    name: 'New Jersey',
+    code: 'NJ',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Construction Lien Claim (N.J.S.A. 2A:44A-6)',
+    notes: 'Commercial liens must be filed within 90 days. Residential requires NUB filing.'
+  },
+  NM: {
+    name: 'New Mexico',
+    code: 'NM',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'completion',
+    statutoryNoticeName: 'Claim of Lien (NMSA § 48-2-6)',
+    notes: 'Subcontractors have 90 days from project completion to record.'
+  },
+  NY: {
+    name: 'New York',
+    code: 'NY',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 240, // 8 months commercial
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: "Notice of Mechanic's Lien (Lien Law § 9)",
+    notes: 'Commercial liens allow 8 months from last furnishing; 4 months for single-family.'
+  },
+  NC: {
+    name: 'North Carolina',
+    code: 'NC',
+    preliminaryNoticeDays: 15,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice to Lien Agent (G.S. 44A-11.2)',
+    notes: 'Must notify Lien Agent within 15 days of first work to protect priority.'
+  },
+  ND: {
+    name: 'North Dakota',
+    code: 'ND',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Intent to File Lien (N.D.C.C. § 35-27-02)',
+    notes: 'Must serve written notice on owner at least 10 days before recording.'
+  },
+  OH: {
+    name: 'Ohio',
+    code: 'OH',
+    preliminaryNoticeDays: 21,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 75,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Furnishing (R.C. 1311.05)',
+    notes: 'Subcontractors must serve notice within 21 days if owner recorded Commencement.'
+  },
+  OK: {
+    name: 'Oklahoma',
+    code: 'OK',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Pre-Lien Notice (42 O.S. § 142.6)',
+    notes: 'Required for commercial projects within 75 days of last work.'
+  },
+  OR: {
+    name: 'Oregon',
+    code: 'OR',
+    preliminaryNoticeDays: 8,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 75,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Right to a Lien (ORS 87.021)',
+    notes: 'Notice must be delivered to owner within 8 days of first delivery.'
+  },
+  PA: {
+    name: 'Pennsylvania',
+    code: 'PA',
+    preliminaryNoticeDays: 45,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 180, // 6 months
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Formal Notice of Intent to Lien (49 P.S. § 1501)',
+    notes: 'Must provide 30-day formal notice to owner prior to recording lien.'
+  },
+  RI: {
+    name: 'Rhode Island',
+    code: 'RI',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 200,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Intention to Claim Lien (R.I.G.L. § 34-28-4)',
+    notes: 'Notice must be filed within 200 days of last work.'
+  },
+  SC: {
+    name: 'South Carolina',
+    code: 'SC',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Furnishing Labor or Materials (Title 29 Ch 5)',
+    notes: 'Must file mechanics lien within 90 days of last furnishing labor or materials.'
+  },
+  SD: {
+    name: 'South Dakota',
+    code: 'SD',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Mechanic’s Lien Statement (SDCL § 44-9-15)',
+    notes: 'Must be filed in county records within 120 days of ceasing labor.'
+  },
+  TN: {
+    name: 'Tennessee',
+    code: 'TN',
+    preliminaryNoticeDays: 90,
+    noticeTrigger: 'last_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'completion',
+    statutoryNoticeName: 'Notice of Nonpayment (Tenn. Code § 66-11-145)',
+    notes: 'Must deliver notice within 90 days of the end of each month unpaid.'
+  },
+  TX: {
+    name: 'Texas',
+    code: 'TX',
+    preliminaryNoticeDays: 45,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Claim / Monthly Notice (Property Code § 53.056)',
+    notes: 'Derivative claimants must send monthly notices to owner and prime contractor.'
+  },
+  UT: {
+    name: 'Utah',
+    code: 'UT',
+    preliminaryNoticeDays: 20,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 180,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Preliminary Notice via SCR (Utah Code § 38-1a-501)',
+    notes: 'Must be filed online with the State Construction Registry (SCR) within 20 days.'
+  },
+  VT: {
+    name: 'Vermont',
+    code: 'VT',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 180,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Contractor’s Lien (9 V.S.A. § 1921)',
+    notes: 'Must be recorded in town clerk’s office within 180 days of payment due.'
+  },
+  VA: {
+    name: 'Virginia',
+    code: 'VA',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Memorandum of Mechanic’s Lien (Va. Code § 43-4)',
+    notes: 'Must be filed within 90 days. Virginia enforces a strict 150-day lookback rule.'
+  },
+  WA: {
+    name: 'Washington',
+    code: 'WA',
+    preliminaryNoticeDays: 60,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 90,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice to Owner (RCW 60.04.031)',
+    notes: 'Commercial subs must give notice within 60 days of first furnishing.'
+  },
+  WV: {
+    name: 'West Virginia',
+    code: 'WV',
+    preliminaryNoticeDays: null,
+    noticeTrigger: 'none',
+    lienFilingDays: 100,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Notice of Mechanics Lien (W. Va. Code § 38-2-7)',
+    notes: 'Subcontractors have 100 days from last labor to record lien.'
+  },
+  WI: {
+    name: 'Wisconsin',
+    code: 'WI',
+    preliminaryNoticeDays: 60,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 180, // 6 months
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Subcontractor’s Identification Notice (Wis. Stat. § 779.02)',
+    notes: 'Must be served within 60 days of first furnishing to maintain rights.'
+  },
+  WY: {
+    name: 'Wyoming',
+    code: 'WY',
+    preliminaryNoticeDays: 30,
+    noticeTrigger: 'first_furnishing',
+    lienFilingDays: 120,
+    lienTrigger: 'last_furnishing',
+    statutoryNoticeName: 'Preliminary Notice (Wyo. Stat. § 29-1-311)',
+    notes: 'Subcontractors must deliver notice to prime and owner within 30 days.'
+  }
+};
+--- END FILE: lib/statutoryRules.ts ---
+
