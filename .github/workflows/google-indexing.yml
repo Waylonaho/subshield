@@ -1,0 +1,78 @@
+name: Google Search Automated Indexing
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'app/**'
+      - 'lib/**'
+  workflow_dispatch:
+
+jobs:
+  index-urls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel deployment to go live
+        run: sleep 65
+
+      - name: Install Google Auth & Requests libraries
+        run: pip install google-auth requests
+
+      - name: Submit Sitemap URLs to Google Indexing API
+        env:
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_INDEXING_CREDENTIALS }}
+        run: |
+          python3 - << 'EOF'
+          import os
+          import json
+          import time
+          import requests
+          import xml.etree.ElementTree as ET
+          from google.oauth2 import service_account
+          from google.auth.transport.requests import Request
+
+          SITEMAP_URL = "https://www.subshieldhq.com/sitemap.xml"
+          INDEXING_ENDPOINT = "https://indexing.googleapis.com/v3/urlNotifications:publish"
+          SCOPES = ["https://www.googleapis.com/auth/indexing"]
+
+          # 1. Authenticate using Service Account Secret
+          creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS_JSON"])
+          credentials = service_account.Credentials.from_service_account_info(
+              creds_dict, scopes=SCOPES
+          )
+          credentials.refresh(Request())
+          access_token = credentials.token
+
+          headers = {
+              "Content-Type": "application/json",
+              "Authorization": f"Bearer {access_token}"
+          }
+
+          # 2. Fetch live sitemap URLs
+          print(f"Fetching sitemap from {SITEMAP_URL}...")
+          resp = requests.get(SITEMAP_URL, timeout=15)
+          resp.raise_for_status()
+
+          root = ET.fromstring(resp.content)
+          ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          urls = [loc.text.strip() for loc in root.findall(".//sm:loc", ns) if loc.text]
+
+          print(f"Found {len(urls)} URLs in sitemap. Submitting to Google Indexing API...")
+
+          # 3. Publish each URL (up to 200/day free quota)
+          success_count = 0
+          for url in urls[:195]:
+              payload = {
+                  "url": url,
+                  "type": "URL_UPDATED"
+              }
+              r = requests.post(INDEXING_ENDPOINT, headers=headers, json=payload, timeout=10)
+              if r.status_code == 200:
+                  print(f"[OK] {url}")
+                  success_count += 1
+              else:
+                  print(f"[ERROR {r.status_code}] {url} -> {r.text}")
+              time.sleep(0.3)
+
+          print(f"\nCompleted: {success_count}/{len(urls)} URLs submitted for priority indexing.")
+          EOF
