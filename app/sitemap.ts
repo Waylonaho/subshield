@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { STATE_LIEN_RULES } from "@/lib/statutoryRules";
+import { TRADE_PROFILES } from "@/lib/tradeProfiles";
 
 function slugifyState(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -18,6 +19,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/tools/labor-burden-calculator`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/tools/lien-waiver-generator`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/tools/notice-of-intent-to-lien`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.9,
@@ -60,6 +73,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  const tradeRoutes: MetadataRoute.Sitemap = Object.keys(TRADE_PROFILES).map(
+    (slug) => ({
+      url: `${baseUrl}/calculators/${slug}-bid-calculator`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    })
+  );
+
   const stateRoutes: MetadataRoute.Sitemap = Object.values(STATE_LIEN_RULES).map(
     (rule) => ({
       url: `${baseUrl}/lien-deadlines/${slugifyState(rule.name)}`,
@@ -69,5 +91,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })
   );
 
-  return [...staticRoutes, ...stateRoutes];
+  return [...staticRoutes, ...tradeRoutes, ...stateRoutes];
 }
