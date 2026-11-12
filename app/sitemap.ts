@@ -82,14 +82,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })
   );
 
-  const stateRoutes: MetadataRoute.Sitemap = Object.values(STATE_LIEN_RULES).map(
-    (rule) => ({
-      url: `${baseUrl}/lien-deadlines/${slugifyState(rule.name)}`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.85,
-    })
-  );
+  const stateDeadlineRoutes: MetadataRoute.Sitemap = Object.values(
+    STATE_LIEN_RULES
+  ).map((rule) => ({
+    url: `${baseUrl}/lien-deadlines/${slugifyState(rule.name)}`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.85,
+  }));
 
-  return [...staticRoutes, ...tradeRoutes, ...stateRoutes];
+  const stateNoticeRoutes: MetadataRoute.Sitemap = Object.values(
+    STATE_LIEN_RULES
+  ).map((rule) => ({
+    url: `${baseUrl}/notices/${slugifyState(rule.name)}-preliminary-notice`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  return [
+    ...staticRoutes,
+    ...tradeRoutes,
+    ...stateDeadlineRoutes,
+    ...stateNoticeRoutes,
+  ];
 }
