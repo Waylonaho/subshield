@@ -5,7 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      disallow: '/api/',
     },
-    sitemap: 'https://subshieldhq.com/sitemap.xml',
+    sitemap: 'https://www.subshieldhq.com/sitemap.xml',
   };
 }
