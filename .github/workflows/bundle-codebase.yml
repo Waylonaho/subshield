@@ -1,0 +1,71 @@
+name: Bundle Codebase for Review
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'codebase-dump.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Bundle files into codebase-dump.txt
+        run: |
+          python3 - << 'EOF'
+          import os
+
+          OUTPUT_FILE = "codebase-dump.txt"
+          IGNORE_DIRS = {
+              ".git", ".next", "node_modules", ".vercel", 
+              ".github", "public", "dist", "build"
+          }
+          IGNORE_FILES = {
+              "package-lock.json", "yarn.lock", "pnpm-lock.yaml", 
+              OUTPUT_FILE, ".DS_Store"
+          }
+          ALLOWED_EXTS = {
+              ".ts", ".tsx", ".js", ".jsx", ".json", 
+              ".css", ".md", ".mjs", ".cjs"
+          }
+
+          with open(OUTPUT_FILE, "w", encoding="utf-8") as out:
+              out.write("=== REPOSITORY STRUCTURE ===\n")
+              file_paths = []
+              for root, dirs, files in os.walk("."):
+                  dirs[:] = sorted([d for d in dirs if d not in IGNORE_DIRS])
+                  for file in sorted(files):
+                      if file in IGNORE_FILES:
+                          continue
+                      ext = os.path.splitext(file)[1].lower()
+                      if ext in ALLOWED_EXTS:
+                          rel_path = os.path.relpath(os.path.join(root, file), ".")
+                          file_paths.append(rel_path)
+                          out.write(f"  - {rel_path}\n")
+
+              out.write("\n" + "="*50 + "\n\n")
+
+              for path in file_paths:
+                  out.write(f"--- START FILE: {path} ---\n")
+                  try:
+                      with open(path, "r", encoding="utf-8") as f:
+                          out.write(f.read())
+                  except Exception as e:
+                      out.write(f"[Error reading file: {e}]")
+                  out.write(f"\n--- END FILE: {path} ---\n\n")
+          EOF
+
+      - name: Commit codebase-dump.txt to repo
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add codebase-dump.txt
+          git diff --staged --quiet || git commit -m "chore: update codebase-dump.txt [skip ci]"
+          git push
