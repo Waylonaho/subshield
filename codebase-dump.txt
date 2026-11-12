@@ -1820,6 +1820,7 @@ export default async function StateLienDeadlinePage({
     notFound();
   }
 
+  const stateSlug = slugifyState(rule.name);
   const allStates = Object.values(STATE_LIEN_RULES).sort((a, b) =>
     a.name.localeCompare(b.name)
   );
@@ -1844,7 +1845,6 @@ export default async function StateLienDeadlinePage({
       : "the last day labor or materials were furnished to the project"
   }.`;
 
-  // JSON-LD FAQ Schema for Google Rich Snippets
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -1875,7 +1875,6 @@ export default async function StateLienDeadlinePage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
@@ -1883,10 +1882,10 @@ export default async function StateLienDeadlinePage({
           </Link>
           <div className="flex items-center gap-4 text-xs">
             <Link
-              href="/tools/labor-burden-calculator"
+              href={`/notices/${stateSlug}-preliminary-notice`}
               className="text-slate-300 hover:text-white transition hidden sm:inline"
             >
-              Labor Burden Calculator
+              {rule.code} Preliminary Notice Guide
             </Link>
             <Link
               href="/"
@@ -1899,7 +1898,6 @@ export default async function StateLienDeadlinePage({
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-12 flex-1 w-full space-y-12">
-        {/* Hero */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Link href="/" className="hover:text-white">
@@ -1918,21 +1916,40 @@ export default async function StateLienDeadlinePage({
           </p>
         </div>
 
-        {/* Interactive Calculator */}
         <StateLienCalculator rule={rule} />
 
         {/* Statutory Breakdown & FAQ */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-          <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-6 space-y-3">
-            <h2 className="text-lg font-bold text-white">{prelimQuestion}</h2>
-            <p className="text-sm text-slate-300 leading-relaxed">{prelimAnswer}</p>
+          <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-6 flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-white">{prelimQuestion}</h2>
+              <p className="text-sm text-slate-300 leading-relaxed">{prelimAnswer}</p>
+            </div>
+            <div>
+              <Link
+                href={`/notices/${stateSlug}-preliminary-notice`}
+                className="text-xs font-bold text-amber-400 hover:underline"
+              >
+                Read Step-by-Step {rule.name} Preliminary Notice Guide →
+              </Link>
+            </div>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-6 space-y-3">
-            <h2 className="text-lg font-bold text-white">
-              How many days do you have to file a mechanics lien in {rule.name}?
-            </h2>
-            <p className="text-sm text-slate-300 leading-relaxed">{filingAnswer}</p>
+          <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-6 flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-white">
+                How many days do you have to file a mechanics lien in {rule.name}?
+              </h2>
+              <p className="text-sm text-slate-300 leading-relaxed">{filingAnswer}</p>
+            </div>
+            <div>
+              <Link
+                href="/tools/notice-of-intent-to-lien"
+                className="text-xs font-bold text-amber-400 hover:underline"
+              >
+                Generate a {rule.name} Notice of Intent to Lien Letter →
+              </Link>
+            </div>
           </div>
         </section>
 
