@@ -1,17 +1,21 @@
 import { MetadataRoute } from "next";
+import { STATE_LIEN_RULES } from "@/lib/statutoryRules";
+
+function slugifyState(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.subshieldhq.com";
   const now = new Date();
 
-  return [
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1.0,
     },
-    // --- Phase 2 SEO Cluster ---
     {
       url: `${baseUrl}/tools/labor-burden-calculator`,
       lastModified: now,
@@ -30,7 +34,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
-    // --- Trust & Compliance Pages ---
     {
       url: `${baseUrl}/about`,
       lastModified: now,
@@ -56,4 +59,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.4,
     },
   ];
+
+  const stateRoutes: MetadataRoute.Sitemap = Object.values(STATE_LIEN_RULES).map(
+    (rule) => ({
+      url: `${baseUrl}/lien-deadlines/${slugifyState(rule.name)}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    })
+  );
+
+  return [...staticRoutes, ...stateRoutes];
 }
