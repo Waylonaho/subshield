@@ -28,6 +28,7 @@
   - components/TradeBidCalculator.tsx
   - lib/generateIcs.ts
   - lib/statutoryRules.ts
+  - lib/supabaseClient.ts
   - lib/tradeProfiles.ts
 
 ==================================================
@@ -4586,6 +4587,16 @@ export const STATE_LIEN_RULES: Record<string, StateLienRule> = {
   }
 };
 --- END FILE: lib/statutoryRules.ts ---
+
+--- START FILE: lib/supabaseClient.ts ---
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+--- END FILE: lib/supabaseClient.ts ---
 
 --- START FILE: lib/tradeProfiles.ts ---
 export interface TradeProfile {
