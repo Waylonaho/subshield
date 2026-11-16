@@ -191,11 +191,29 @@ export default function StateLienCalculator({ rule }: { rule: StateLienRule }) {
           Download {rule.code} Calendar Reminders (.ics)
         </button>
 
+        <span className="text-xs text-slate-400">
+          One-time `.ics` export for Apple, Google &amp; Outlook calendars
+        </span>
+      </div>
+
+      {/* Embedded Cutoff Reminder Conversion Box */}
+      <div className="rounded-xl bg-gradient-to-r from-amber-500/15 via-slate-950 to-slate-950 border border-amber-500/35 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-amber-400">
+            Never Miss This {rule.code} Cutoff
+          </span>
+          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+            Don&apos;t rely on a single calendar ping. Track up to{" "}
+            <strong>30 active jobs</strong> and get automatic{" "}
+            <strong>14-day, 7-day, and 2-day email countdown warnings</strong>{" "}
+            before your {rule.name} lien rights expire.
+          </p>
+        </div>
         <a
           href={STRIPE_PRO_URL}
-          className="w-full sm:w-auto text-center px-5 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 font-semibold text-sm transition"
+          className="shrink-0 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider transition"
         >
-          Get Automated SMS Alerts ($19/mo) →
+          Send Me Cutoff Alerts ($19/mo) →
         </a>
       </div>
     </div>
