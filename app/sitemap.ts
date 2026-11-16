@@ -77,6 +77,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.4,
     },
+        {
+      url: `${baseUrl}/tools`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
   ];
 
   const tradeRoutes: MetadataRoute.Sitemap = Object.keys(TRADE_PROFILES).map(
