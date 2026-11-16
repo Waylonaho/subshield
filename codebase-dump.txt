@@ -3931,11 +3931,14 @@ export default function LienWaiverGenerator() {
             Sub<span className="text-amber-500">Shield</span>HQ
           </Link>
           <div className="flex items-center gap-4 text-xs">
-            <Link href="/tools/notice-of-intent-to-lien" className="text-slate-300 hover:text-white transition hidden sm:inline">
+            <Link href="/tools" className="text-slate-300 hover:text-white transition hidden sm:inline">
+              All Tools
+            </Link>
+            <Link href="/tools/notice-of-intent-to-lien" className="text-slate-300 hover:text-white transition hidden md:inline">
               Notice of Intent Generator
             </Link>
             <Link href="/" className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-semibold transition">
-              ← Main Tools
+              ← Home
             </Link>
           </div>
         </div>
@@ -4151,16 +4154,24 @@ export default function LienWaiverGenerator() {
               </div>
             </div>
 
-            <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 print:hidden">
-              <div className="text-xs text-slate-300">
-                <strong className="text-amber-400 block text-sm mb-0.5">Note on Statutory Forms (CA, TX, FL, GA, AZ, MI, MO, MS, NV, UT, WY):</strong>
-                Certain states mandate exact statutory wording by code. Always verify statutory form text and track your {selectedState.name} lien cutoff ({selectedState.lienFilingDays} days) automatically.
+            {/* Panic-Moment Interception Box */}
+            <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/30 border border-amber-500/40 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 print:hidden">
+              <div className="space-y-1.5">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-amber-400">
+                  Submitting a Progress Draw or Retainage Waiver?
+                </span>
+                <h2 className="text-base font-extrabold text-white">
+                  Track Your {selectedState.name} Lien Cutoff ({selectedState.lienFilingDays} Days) Before Retainage Goes Overdue
+                </h2>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  One missed filing window forfeits 100% of your mechanics lien leverage on unpaid retainage. Note: States like CA, TX, FL, GA, AZ, MI, MO, MS, NV, UT, and WY also mandate statutory form text. Put all 30 active jobs on automated 14-day, 7-day, and 2-day email countdown alerts for $19/mo.
+                </p>
               </div>
               <a
                 href={STRIPE_PRO_URL}
-                className="shrink-0 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition"
+                className="shrink-0 px-5 py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider transition"
               >
-                Track Deadlines ($19/mo)
+                Activate Pro Alerts ($19/mo) →
               </a>
             </div>
           </div>
