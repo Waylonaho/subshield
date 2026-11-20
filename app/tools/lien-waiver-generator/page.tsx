@@ -12,6 +12,87 @@ type WaiverType =
   | "conditional_final"
   | "unconditional_final";
 
+interface StatutoryWaiverRule {
+  citation: string;
+  notaryRequired: boolean;
+  warning: string;
+}
+
+const STATUTORY_WAIVER_STATES: Record<string, StatutoryWaiverRule> = {
+  AZ: {
+    citation: "Ariz. Rev. Stat. § 33-1008",
+    notaryRequired: false,
+    warning:
+      "Arizona mandates strict statutory waiver wording. Unconditional waivers must include statutory warning text in type at least as large as the largest other type on the form.",
+  },
+  CA: {
+    citation: "Cal. Civ. Code §§ 8132–8138",
+    notaryRequired: false,
+    warning:
+      "California requires verbatim statutory forms (Civil Code §§ 8132–8138). Non-conforming waivers are legally void.",
+  },
+  FL: {
+    citation: "Fla. Stat. § 713.20",
+    notaryRequired: false,
+    warning:
+      "Florida prescribes statutory progress and final waiver forms under § 713.20. A lienor cannot be required to sign a non-statutory form.",
+  },
+  GA: {
+    citation: "O.C.G.A. § 44-14-366",
+    notaryRequired: true,
+    warning:
+      "Georgia mandates statutory Interim and Final waiver forms, requires witness/notary execution, and converts waivers into unconditional releases after 90 days unless an Affidavit of Nonpayment is recorded.",
+  },
+  MA: {
+    citation: "M.G.L. c. 254, § 32",
+    notaryRequired: false,
+    warning:
+      "Massachusetts prescribes a statutory partial waiver and subordination form for general contractors with no material deviation permitted.",
+  },
+  MI: {
+    citation: "MCL 570.1115",
+    notaryRequired: false,
+    warning:
+      "Michigan requires waivers to be in substantially the statutory format set forth in MCL 570.1115(9).",
+  },
+  MO: {
+    citation: "Mo. Rev. Stat. § 429.005",
+    notaryRequired: false,
+    warning:
+      "Missouri regulates advance waivers under § 429.005 and requires specific statutory consent wording for residential mechanic's liens.",
+  },
+  MS: {
+    citation: "Miss. Code §§ 85-7-419, 85-7-433",
+    notaryRequired: true,
+    warning:
+      "Mississippi mandates statutory Interim and Final waiver forms, requires notarization, and deems payment made after 60 days unless an Affidavit of Nonpayment is filed.",
+  },
+  NV: {
+    citation: "NRS 108.2457",
+    notaryRequired: false,
+    warning:
+      "Nevada requires statutory waiver forms to be reproduced verbatim; adding non-statutory clauses voids the waiver.",
+  },
+  TX: {
+    citation: "Tex. Prop. Code §§ 53.281–53.284",
+    notaryRequired: false,
+    warning:
+      "Texas mandates exact statutory forms under Property Code § 53.284 (notarization is no longer required for contracts signed on or after Jan. 1, 2022).",
+  },
+  UT: {
+    citation: "Utah Code § 38-1a-802",
+    notaryRequired: false,
+    warning:
+      "Utah requires waivers to follow the statutory forms set out in Utah Code § 38-1a-802.",
+  },
+  WY: {
+    citation: "Wyo. Stat. § 29-10-101",
+    notaryRequired: true,
+    warning:
+      "Wyoming mandates statutory lien waiver language and notarization under Wyo. Stat. § 29-10-101.",
+  },
+};
+
 export default function LienWaiverGenerator() {
   const [waiverType, setWaiverType] = useState<WaiverType>("conditional_progress");
   const [stateCode, setStateCode] = useState<string>("SC");
@@ -22,11 +103,13 @@ export default function LienWaiverGenerator() {
   const [throughDate, setThroughDate] = useState<string>("");
   const [paymentAmount, setPaymentAmount] = useState<string>("5000.00");
   const [exceptions, setExceptions] = useState<string>("Unbilled change orders and retainage");
+  const [legalAccepted, setLegalAccepted] = useState<boolean>(false);
 
   const states = Object.values(STATE_LIEN_RULES).sort((a, b) =>
     a.name.localeCompare(b.name)
   );
   const selectedState = STATE_LIEN_RULES[stateCode] || states[0];
+  const statutoryRule = STATUTORY_WAIVER_STATES[stateCode];
 
   const isUnconditional = waiverType.startsWith("unconditional");
   const isFinal = waiverType.endsWith("final");
@@ -36,6 +119,14 @@ export default function LienWaiverGenerator() {
     unconditional_progress: "UNCONDITIONAL WAIVER AND RELEASE ON PROGRESS PAYMENT",
     conditional_final: "CONDITIONAL WAIVER AND RELEASE ON FINAL PAYMENT",
     unconditional_final: "UNCONDITIONAL WAIVER AND RELEASE ON FINAL PAYMENT",
+  };
+
+  const handlePrint = () => {
+    if (!legalAccepted) {
+      alert("Please check the self-help acknowledgment box before printing or saving your PDF.");
+      return;
+    }
+    window.print();
   };
 
   return (
@@ -72,7 +163,7 @@ export default function LienWaiverGenerator() {
           </p>
         </div>
 
-        {/* Critical Safety Warning */}
+        {/* Conditional vs. Unconditional Safety Warning */}
         {isUnconditional ? (
           <div className="p-4 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs sm:text-sm print:hidden">
             <strong>⚠️ CRITICAL WARNING:</strong> You selected an <strong>UNCONDITIONAL</strong> waiver. Never sign or deliver an unconditional lien waiver until the check has physically cleared your bank account. If the check bounces, you may still forfeit your mechanics lien rights.
@@ -80,6 +171,19 @@ export default function LienWaiverGenerator() {
         ) : (
           <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs sm:text-sm print:hidden">
             <strong>✓ SAFE CHOICE:</strong> A <strong>Conditional</strong> waiver only becomes legally effective once actual payment clears your account. Always use conditional waivers when submitting a pay application.
+          </div>
+        )}
+
+        {/* Dynamic 12-State Statutory Form Alert */}
+        {statutoryRule && (
+          <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-500/50 text-amber-200 text-xs sm:text-sm print:hidden space-y-1">
+            <div className="font-extrabold uppercase tracking-wider text-amber-400">
+              ⚖️ {selectedState.name} Statutory Form Mandate ({statutoryRule.citation})
+            </div>
+            <p>{statutoryRule.warning}</p>
+            <p className="text-amber-300/90 text-xs pt-0.5">
+              This tool generates a general commercial template. Before submitting in {selectedState.name}, verify that your GC&apos;s form matches {statutoryRule.citation} verbatim.
+            </p>
           </div>
         )}
 
@@ -113,7 +217,7 @@ export default function LienWaiverGenerator() {
               >
                 {states.map((s) => (
                   <option key={s.code} value={s.code}>
-                    {s.name} ({s.code})
+                    {s.name} ({s.code}) {STATUTORY_WAIVER_STATES[s.code] ? "• Statutory Form State" : ""}
                   </option>
                 ))}
               </select>
@@ -210,10 +314,28 @@ export default function LienWaiverGenerator() {
               </div>
             )}
 
+            {/* Active Clickwrap UPL Acknowledgment */}
+            <label className="flex items-start gap-2.5 p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={legalAccepted}
+                onChange={(e) => setLegalAccepted(e.target.checked)}
+                className="mt-0.5 accent-amber-500"
+              />
+              <span>
+                I acknowledge SubShieldHQ is a self-help software tool, not a law firm, and that I am responsible for verifying statutory wording and contract terms before signing.
+              </span>
+            </label>
+
             <button
               type="button"
-              onClick={() => window.print()}
-              className="w-full py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition cursor-pointer"
+              onClick={handlePrint}
+              disabled={!legalAccepted}
+              className={`w-full py-3 rounded-lg font-bold text-sm transition ${
+                legalAccepted
+                  ? "bg-amber-500 hover:bg-amber-400 text-slate-950 cursor-pointer"
+                  : "bg-slate-800 text-slate-500 cursor-not-allowed"
+              }`}
             >
               Print / Save Waiver as PDF
             </button>
@@ -267,6 +389,23 @@ export default function LienWaiverGenerator() {
                   <p className="mt-1 font-bold">Date Signed</p>
                 </div>
               </div>
+
+              {statutoryRule?.notaryRequired && (
+                <div className="pt-4 border-t border-slate-300 text-xs text-slate-700 space-y-2">
+                  <p className="font-bold uppercase">Notary Acknowledgment ({selectedState.name} Statutory Requirement)</p>
+                  <p>
+                    Subscribed and sworn to before me this _____ day of ______________, 20____.
+                  </p>
+                  <div className="pt-4">
+                    <div className="border-b border-slate-900 w-64 h-6"></div>
+                    <p className="mt-1">Notary Public • My Commission Expires: ______________</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-4 border-t border-slate-200 text-[10px] text-slate-500 font-sans">
+                Self-help template generated via SubShieldHQ. Informational resource only; does not constitute legal advice.
+              </div>
             </div>
 
             {/* Panic-Moment Interception Box */}
@@ -279,7 +418,7 @@ export default function LienWaiverGenerator() {
                   Track Your {selectedState.name} Lien Cutoff ({selectedState.lienFilingDays} Days) Before Retainage Goes Overdue
                 </h2>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  One missed filing window forfeits 100% of your mechanics lien leverage on unpaid retainage. Note: States like CA, TX, FL, GA, AZ, MI, MO, MS, NV, UT, and WY also mandate statutory form text. Put all 30 active jobs on automated 14-day, 7-day, and 2-day email countdown alerts for $19/mo.
+                  One missed filing window forfeits 100% of your mechanics lien leverage on unpaid retainage. Put all 30 active jobs on automated 14-day, 7-day, and 2-day email countdown alerts for $19/mo.
                 </p>
               </div>
               <a
