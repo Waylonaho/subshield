@@ -4575,11 +4575,20 @@ export default function NoticeOfIntentGenerator() {
   const [unpaidAmount, setUnpaidAmount] = useState<string>("12,450.00");
   const [lastWorkDate, setLastWorkDate] = useState<string>("");
   const [demandDays, setDemandDays] = useState<string>("10");
+  const [legalAccepted, setLegalAccepted] = useState<boolean>(false);
 
   const states = Object.values(STATE_LIEN_RULES).sort((a, b) =>
     a.name.localeCompare(b.name)
   );
   const selectedState = STATE_LIEN_RULES[stateCode] || states[0];
+
+  const handlePrint = () => {
+    if (!legalAccepted) {
+      alert("Please check the self-help acknowledgment box before printing or saving your PDF.");
+      return;
+    }
+    window.print();
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -4613,6 +4622,10 @@ export default function NoticeOfIntentGenerator() {
           <p className="text-slate-400 text-sm max-w-3xl">
             Collect overdue commercial invoices without paying $1,500+ in attorney fees. Generate a formal Certified Mail Notice of Intent to File a Mechanics Lien pre-loaded with your state&apos;s statutory reference.
           </p>
+        </div>
+
+        <div className="p-4 rounded-xl bg-amber-950/35 border border-amber-500/35 text-amber-200 text-xs sm:text-sm print:hidden">
+          <strong>Important Timing Note:</strong> Sending a Notice of Intent to Lien does <strong>not</strong> extend your statutory county recording deadline ({selectedState.lienFilingDays} days in {selectedState.name}). Always mail your NOI at least 15–20 days before your lien cutoff expires.
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -4736,10 +4749,28 @@ export default function NoticeOfIntentGenerator() {
               </div>
             </div>
 
+            {/* Active Clickwrap UPL Acknowledgment */}
+            <label className="flex items-start gap-2.5 p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={legalAccepted}
+                onChange={(e) => setLegalAccepted(e.target.checked)}
+                className="mt-0.5 accent-amber-500"
+              />
+              <span>
+                I acknowledge SubShieldHQ is a self-help software tool, not a law firm, and that sending an NOI does not toll or extend statutory lien recording deadlines.
+              </span>
+            </label>
+
             <button
               type="button"
-              onClick={() => window.print()}
-              className="w-full py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition cursor-pointer"
+              onClick={handlePrint}
+              disabled={!legalAccepted}
+              className={`w-full py-3 rounded-lg font-bold text-sm transition ${
+                legalAccepted
+                  ? "bg-amber-500 hover:bg-amber-400 text-slate-950 cursor-pointer"
+                  : "bg-slate-800 text-slate-500 cursor-not-allowed"
+              }`}
             >
               Print / Save Letter as PDF
             </button>
@@ -4792,6 +4823,10 @@ export default function NoticeOfIntentGenerator() {
                 <p>Sincerely,</p>
                 <div className="border-b border-slate-900 w-64 h-8 mt-4"></div>
                 <p className="font-bold mt-1">{claimantName || "[Authorized Representative]"}</p>
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 text-[10px] text-slate-500 font-sans">
+                Self-help demand template generated via SubShieldHQ. Informational resource only; does not constitute legal advice.
               </div>
             </div>
 
