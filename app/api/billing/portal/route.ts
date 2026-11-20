@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
   try {
@@ -65,19 +64,46 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const stripe = new Stripe(stripeSecretKey);
     const origin =
       req.headers.get("origin") || "https://www.subshieldhq.com";
 
-    const portalSession = await stripe.billingPortal.sessions.create({
+    // Create Stripe Billing Portal session via direct REST API call
+    const formBody = new URLSearchParams({
       customer: subRecord.stripe_customer_id,
       return_url: `${origin}/dashboard`,
     });
 
-    return NextResponse.json({ url: portalSession.url });
+    const stripeRes = await fetch(
+      "https://api.stripe.com/v1/billing_portal/sessions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${stripeSecretKey}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formBody.toString(),
+      }
+    );
+
+    const stripeData = await stripeRes.json();
+
+    if (!stripeRes.ok || !stripeData.url) {
+      return NextResponse.json(
+        {
+          error:
+            stripeData?.error?.message ||
+            "Failed to create Stripe billing portal session.",
+        },
+        { status: stripeRes.status || 500 }
+      );
+    }
+
+    return NextResponse.json({ url: stripeData.url });
   } catch (err: unknown) {
     const message =
-      err instanceof Error ? err.message : "Failed to create billing portal session.";
+      err instanceof Error
+        ? err.message
+        : "Failed to create billing portal session.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
