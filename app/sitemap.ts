@@ -83,6 +83,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+        {
+      url: `${baseUrl}/guides/retainage-and-pay-when-paid-by-state`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
   ];
 
   const tradeRoutes: MetadataRoute.Sitemap = Object.keys(TRADE_PROFILES).map(
