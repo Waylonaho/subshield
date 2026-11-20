@@ -41,6 +41,7 @@ export default function ProDashboardPage() {
   const [isPro, setIsPro] = useState(false);
   const [projects, setProjects] = useState<TrackedProject[]>([]);
   const [savingProject, setSavingProject] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
 
   // New Project Form
   const [projectName, setProjectName] = useState("");
@@ -106,6 +107,40 @@ export default function ProDashboardPage() {
       alert(error.message);
     } else {
       setMagicLinkSent(true);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    setOpeningPortal(true);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        alert("Session expired. Please sign in again.");
+        setOpeningPortal(false);
+        return;
+      }
+
+      const res = await fetch("/api/billing/portal", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        alert(data.error || "Could not open billing portal.");
+        setOpeningPortal(false);
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch {
+      alert("Network error opening billing portal. Please try again.");
+      setOpeningPortal(false);
     }
   };
 
@@ -195,12 +230,23 @@ export default function ProDashboardPage() {
           <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
             Sub<span className="text-amber-500">Shield</span>HQ
           </Link>
-          <div className="flex items-center gap-4 text-xs">
-            <Link href="/" className="text-slate-300 hover:text-white">
+          <div className="flex items-center gap-3 sm:gap-4 text-xs">
+            <Link href="/" className="text-slate-300 hover:text-white hidden sm:inline">
               Calculators
             </Link>
+            {user && isPro && (
+              <button
+                type="button"
+                onClick={handleManageBilling}
+                disabled={openingPortal}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-semibold transition cursor-pointer disabled:opacity-50"
+              >
+                {openingPortal ? "Opening..." : "Manage Billing / Cancel"}
+              </button>
+            )}
             {user && (
               <button
+                type="button"
                 onClick={() => supabase.auth.signOut()}
                 className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer"
               >
@@ -252,7 +298,7 @@ export default function ProDashboardPage() {
             {/* Subscription Status Banner */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-xl font-extrabold text-white">
                     Active Lien Deadline Tracker
                   </h1>
@@ -271,7 +317,16 @@ export default function ProDashboardPage() {
                 </p>
               </div>
 
-              {!isPro && (
+              {isPro ? (
+                <button
+                  type="button"
+                  onClick={handleManageBilling}
+                  disabled={openingPortal}
+                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs transition shrink-0 cursor-pointer"
+                >
+                  {openingPortal ? "Opening Portal..." : "Manage Subscription →"}
+                </button>
+              ) : (
                 <a
                   href={STRIPE_PRO_URL}
                   className="px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition shrink-0"
@@ -286,9 +341,14 @@ export default function ProDashboardPage() {
               onSubmit={handleAddProject}
               className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4"
             >
-              <h2 className="text-sm font-bold uppercase tracking-wider text-amber-400">
-                + Track New Commercial Project
-              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <h2 className="text-sm font-bold uppercase tracking-wider text-amber-400">
+                  + Track New Commercial Project
+                </h2>
+                <span className="text-[11px] text-slate-500">
+                  Informational reminders only • Always verify county recording rules
+                </span>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Project / GC Name</label>
@@ -353,19 +413,27 @@ export default function ProDashboardPage() {
               ) : (
                 projects.map((job) => {
                   const lienDaysLeft = daysRemaining(job.lien_deadline);
+                  const isUrgent = lienDaysLeft >= 0 && lienDaysLeft <= 14;
                   return (
                     <div
                       key={job.id}
-                      className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                      className={`bg-slate-900 border rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                        isUrgent ? "border-rose-500/50" : "border-slate-800"
+                      }`}
                     >
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <span className="font-bold text-white text-base">
                             {job.project_name}
                           </span>
                           <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-semibold">
                             {job.state_code}
                           </span>
+                          {isUrgent && (
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                              URGENT CUTOFF
+                            </span>
+                          )}
                         </div>
                         <div className="flex flex-wrap gap-4 text-xs text-slate-400 mt-1.5">
                           <span>
@@ -385,6 +453,7 @@ export default function ProDashboardPage() {
                       </div>
 
                       <button
+                        type="button"
                         onClick={() => handleDeleteProject(job.id)}
                         className="text-xs text-slate-500 hover:text-rose-400 transition self-end sm:self-center cursor-pointer"
                       >
