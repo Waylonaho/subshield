@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { STATE_LIEN_RULES } from "@/lib/statutoryRules";
+import AffiliateGearSection from "@/components/AffiliateGearSection";
 
 const STRIPE_PRO_URL = "https://buy.stripe.com/28E14n6FPd3fgpK8K52VG00";
 
@@ -293,6 +294,9 @@ export default function NoticeOfIntentGenerator() {
             </div>
           </div>
         </div>
+
+        {/* Back-Office Lien & Document Processing Supplies */}
+        <AffiliateGearSection context="lien_office" />
       </main>
     </div>
   );
