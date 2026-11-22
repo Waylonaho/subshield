@@ -275,6 +275,7 @@ import Link from "next/link";
 import { STATE_LIEN_RULES as statutoryRules, StateLienRule } from "@/lib/statutoryRules";
 import { TRADE_PROFILES } from "@/lib/tradeProfiles";
 import { generateIcsFile as generateIcsContent } from "@/lib/generateIcs";
+import AffiliateGearSection from "@/components/AffiliateGearSection";
 
 const STRIPE_PRO_URL = "https://buy.stripe.com/28E14n6FPd3fgpK8K52VG00";
 const STORAGE_KEY = "subshield_company_rates_v1";
@@ -977,6 +978,9 @@ export default function Home() {
           </div>
         </section>
 
+        {/* --- FIELD & OFFICE RESOURCES --- */}
+        <AffiliateGearSection context="field_general" />
+
         {/* --- SEO INTERNAL LINK DIRECTORY: TRADE CALCULATORS --- */}
         <section className="border-t border-slate-800 pt-10 space-y-4">
           <h2 className="text-base font-bold text-white">
@@ -1032,6 +1036,9 @@ export default function Home() {
               <Link href="/guides/mechanics-lien-deadlines-by-state" className="hover:text-white transition">
                 50-State Deadlines Chart
               </Link>
+              <Link href="/guides/retainage-and-pay-when-paid-by-state" className="hover:text-white transition">
+                Retainage &amp; Pay-If-Paid Laws
+              </Link>
               <Link href="/tools/labor-burden-calculator" className="hover:text-white transition">
                 Labor Burden Calculator
               </Link>
@@ -1051,7 +1058,9 @@ export default function Home() {
           </div>
 
           <div className="pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-            <p>© {new Date().getFullYear()} SubShieldHQ. Informational tools only; not legal advice.</p>
+            <p>
+              © {new Date().getFullYear()} SubShieldHQ. Informational tools only; not legal advice. As an Amazon Associate I earn from qualifying purchases.
+            </p>
             <div className="flex flex-wrap gap-5">
               <Link href="/about" className="hover:text-slate-300 transition">
                 About &amp; Methodology
