@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import AffiliateGearSection from "@/components/AffiliateGearSection";
 
 export default function MarkupVsMarginGuide() {
   const [jobCost, setJobCost] = useState<number>(10000);
@@ -109,7 +110,7 @@ export default function MarkupVsMarginGuide() {
           </div>
 
           <p className="text-xs text-slate-400 italic">
-            In this example, confusing markup with margin leaves 
+            In this example, confusing markup with margin leaves{" "}
             <strong className="text-amber-400"> ${(marginPrice - markupPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong> of unrecovered revenue on the table.
           </p>
         </div>
@@ -132,6 +133,9 @@ export default function MarkupVsMarginGuide() {
           </div>
         </section>
 
+        {/* Estimating Resources */}
+        <AffiliateGearSection context="estimating" />
+
         <section className="border-t border-slate-800 pt-8 text-center space-y-4">
           <h3 className="text-lg font-bold text-white">Need a spreadsheet that handles the math automatically?</h3>
           <Link
@@ -144,7 +148,7 @@ export default function MarkupVsMarginGuide() {
       </main>
 
       <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} SubShieldHQ.
+        © {new Date().getFullYear()} SubShieldHQ. As an Amazon Associate I earn from qualifying purchases.
       </footer>
     </div>
   );
