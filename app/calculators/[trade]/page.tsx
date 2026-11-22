@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TRADE_PROFILES } from "@/lib/tradeProfiles";
 import TradeBidCalculator from "@/components/TradeBidCalculator";
+import AffiliateGearSection from "@/components/AffiliateGearSection";
 
 export async function generateStaticParams() {
   return Object.keys(TRADE_PROFILES).map((slug) => ({
@@ -137,7 +138,7 @@ export default async function TradeCalculatorPage({
               {trade.typicalBurdenNote}
             </p>
             <div className="text-xs text-amber-400 font-semibold pt-1">
-              Typical Workers' Comp Range: {trade.workersCompRange}
+              Typical Workers&apos; Comp Range: {trade.workersCompRange}
             </div>
           </div>
 
@@ -164,6 +165,9 @@ export default async function TradeCalculatorPage({
             <p className="text-sm text-slate-300 leading-relaxed">{trade.commonEquipment}</p>
           </div>
         </section>
+
+        {/* Trade-Matched Affiliate Gear Section */}
+        <AffiliateGearSection tradeName={trade.shortName} />
 
         {/* Other Trade Calculators Directory */}
         <section className="border-t border-slate-800 pt-10 space-y-4 print:hidden">
@@ -192,7 +196,7 @@ export default async function TradeCalculatorPage({
       </main>
 
       <footer className="border-t border-slate-800 py-8 px-4 text-center text-xs text-slate-500 print:hidden">
-        © {new Date().getFullYear()} SubShieldHQ. Informational estimating tools only.
+        © {new Date().getFullYear()} SubShieldHQ. Informational estimating tools only. As an Amazon Associate I earn from qualifying purchases.
       </footer>
     </div>
   );
