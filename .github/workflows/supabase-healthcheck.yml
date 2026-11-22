@@ -1,0 +1,27 @@
+name: Supabase Database Health Check
+
+on:
+  schedule:
+    # Runs twice a week (Monday & Thursday at 14:15 UTC) to verify DB responsiveness
+    - cron: "15 14 * * 1,4"
+  workflow_dispatch: # Allows manual 1-click testing in the Actions tab
+
+jobs:
+  healthcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Supabase PostgREST endpoint
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/projects?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+
+          echo "Supabase PostgREST HTTP Status: $STATUS"
+
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 300 ]; then
+            echo "Database health check passed."
+          else
+            echo "Database health check failed with status $STATUS"
+            exit 1
+          fi
