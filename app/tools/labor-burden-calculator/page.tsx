@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import AffiliateGearSection from "@/components/AffiliateGearSection";
 
 export default function LaborBurdenCalculator() {
   // Base Wage & Hours
@@ -77,7 +78,7 @@ export default function LaborBurdenCalculator() {
           </h1>
           <p className="text-slate-400 text-sm sm:text-base mt-2 max-w-3xl">
             An employee who earns $32/hour actually costs your business significantly more. 
-            Use this calculator to audit payroll taxes, workers' compensation rates, and benefits 
+            Use this calculator to audit payroll taxes, workers&apos; compensation rates, and benefits 
             to discover your true cost per productive billable hour.
           </p>
         </div>
@@ -87,7 +88,7 @@ export default function LaborBurdenCalculator() {
           {/* Inputs Column (2 cols wide) */}
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 sm:p-8 space-y-6">
             <h2 className="text-lg font-bold text-white border-b border-slate-800 pb-3">
-              1. Base Wage & Hours
+              1. Base Wage &amp; Hours
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -116,12 +117,12 @@ export default function LaborBurdenCalculator() {
             </div>
 
             <h2 className="text-lg font-bold text-white border-b border-slate-800 pb-3 pt-2">
-              2. Mandatory Employer Payroll Taxes & Insurance
+              2. Mandatory Employer Payroll Taxes &amp; Insurance
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
-                  FICA (Social Security & Medicare) %
+                  FICA (Social Security &amp; Medicare) %
                 </label>
                 <input
                   type="number"
@@ -143,11 +144,11 @@ export default function LaborBurdenCalculator() {
                   onChange={(e) => setSutaRate(Number(e.target.value))}
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
                 />
-                <span className="text-xs text-slate-500 mt-1 block">Varies by state & rating</span>
+                <span className="text-xs text-slate-500 mt-1 block">Varies by state &amp; rating</span>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-300 uppercase mb-2">
-                  Workers' Comp (% of Payroll)
+                  Workers&apos; Comp (% of Payroll)
                 </label>
                 <input
                   type="number"
@@ -161,7 +162,7 @@ export default function LaborBurdenCalculator() {
             </div>
 
             <h2 className="text-lg font-bold text-white border-b border-slate-800 pb-3 pt-2">
-              3. Benefits & Non-Productive Time
+              3. Benefits &amp; Non-Productive Time
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -186,7 +187,7 @@ export default function LaborBurdenCalculator() {
                   onChange={(e) => setAnnualBenefitsCost(Number(e.target.value))}
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500 font-mono"
                 />
-                <span className="text-xs text-slate-500 mt-1 block">Total perks & safety allowance</span>
+                <span className="text-xs text-slate-500 mt-1 block">Total perks &amp; safety allowance</span>
               </div>
             </div>
           </div>
@@ -208,15 +209,15 @@ export default function LaborBurdenCalculator() {
                   <span className="font-mono text-white">${Math.round(annualFica).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">SUTA & FUTA:</span>
+                  <span className="text-slate-400">SUTA &amp; FUTA:</span>
                   <span className="font-mono text-white">${Math.round(annualSuta + annualFuta).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Workers' Comp:</span>
+                  <span className="text-slate-400">Workers&apos; Comp:</span>
                   <span className="font-mono text-white">${Math.round(annualWorkersComp).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Paid Leave & Perks:</span>
+                  <span className="text-slate-400">Paid Leave &amp; Perks:</span>
                   <span className="font-mono text-white">
                     ${Math.round(annualPaidLeaveCost + annualBenefitsCost).toLocaleString()}
                   </span>
@@ -271,21 +272,24 @@ export default function LaborBurdenCalculator() {
               only base wages (e.g. $30/hr), they are absorbing 25% to 40% of hidden payroll costs straight out of their profit margin.
             </p>
             <p>
-              The primary elements that comprise a contractor's labor burden include:
+              The primary elements that comprise a contractor&apos;s labor burden include:
             </p>
             <ul className="list-disc list-inside space-y-2 mt-3 text-slate-300">
               <li><strong>Employer FICA:</strong> 6.2% Social Security + 1.45% Medicare.</li>
-              <li><strong>FUTA & SUTA:</strong> Federal and State unemployment insurance taxes.</li>
+              <li><strong>FUTA &amp; SUTA:</strong> Federal and State unemployment insurance taxes.</li>
               <li><strong>Workers’ Compensation:</strong> Heavily elevated in construction trades depending on risk classifications (roofing and steel erection carry much higher rates than painting or trim carpentry).</li>
               <li><strong>Non-Productive Paid Hours:</strong> Holidays, sick days, weather cancellations, and training time that generate zero billable job revenue.</li>
             </ul>
           </div>
         </div>
+
+        {/* Estimating Resources */}
+        <AffiliateGearSection context="estimating" />
       </main>
 
       {/* Footer */}
       <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} SubShieldHQ. For operational estimating purposes only.
+        © {new Date().getFullYear()} SubShieldHQ. For operational estimating purposes only. As an Amazon Associate I earn from qualifying purchases.
       </footer>
     </div>
   );
